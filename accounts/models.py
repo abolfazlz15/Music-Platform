@@ -4,6 +4,15 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.managers import UserManager
 
+
+class ImageProfile(models.Model):
+    title = models.CharField(max_length=100, verbose_name=_('title'))
+    image = models.ImageField(upload_to='profile_image', verbose_name=_('image profile'))   
+
+    def __str__(self):
+        return self.title
+
+
 class User(AbstractBaseUser):
     email = models.EmailField(
         verbose_name=_('email address'),
@@ -11,6 +20,7 @@ class User(AbstractBaseUser):
         unique=True,
     )
     username = models.CharField(unique=True, max_length=100, verbose_name=_('username'))
+    profile_image = models.ForeignKey(ImageProfile, null=True, blank=True, on_delete=models.SET_NULL, related_name='users', verbose_name=_('profile image'))
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
@@ -34,3 +44,5 @@ class User(AbstractBaseUser):
     def is_staff(self):
         # Simplest possible answer: All admins are staff
         return self.is_admin
+
+

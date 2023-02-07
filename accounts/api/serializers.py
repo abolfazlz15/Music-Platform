@@ -40,3 +40,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         except serializers.ValidationError as error:
             self.add_error('password', error)
         return value    
+
+
+class GetOTPRegisterCodeSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=4)
+
+    def save(self, validated_data):
+        refresh = RefreshToken.for_user(validated_data)
+        return ({
+            'success': True,
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        })

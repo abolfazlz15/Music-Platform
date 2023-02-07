@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from accounts.models import User
 from accounts.api import serializers
 from accounts.otp_service import OTP
 
@@ -31,3 +31,26 @@ class UserRegisterView(APIView):
 
             return Response({'email': clean_data['email'], 'result': 'email sended'}, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+class GetOTPRegisterCodeView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = serializers.GetOTPRegisterCodeSerializer(data=request.data)
+        user_data = cache.get(key='register')
+        otp_service = OTP()
+        if user_data is None:
+            return Response({'error': 'this code not exist or invalid', 'success': False}, status=status.HTTP_404_NOT_FOUND)
+
+        if serializer.is_valid():
+            clean_data = serializer.validated_data
+
+            if otp_service.verify_otp(otp=clean_data['code'], email=user_data['email']):
+                user = User.objects.create_user(email=user_data['email'], username=user_data['username'], password=user_data['password'])
+                result = serializer.save(validated_data=user)
+                return Response(result, status=status.HTTP_201_CREATED)
+
+            return Response({'error': 'this code not exist or invalid', 'success': False}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+

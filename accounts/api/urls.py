@@ -12,4 +12,9 @@ urlpatterns = [
     
     # login URL
     path('login', views.UserLoginView.as_view(), name='login'),
+
+    # register URL
+    path('register', views.UserRegisterView.as_view(), name='register'),
+    path('check', views.GetOTPRegisterCodeView.as_view(), name='check-otp'),
+    
 ]

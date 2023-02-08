@@ -2,7 +2,21 @@ from django.contrib.auth import authenticate, password_validation
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from accounts.models import User
+from accounts.models import User, ImageProfile
+
+
+
+class ImageProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageProfile
+        fields = ('image',)
+
+class UserSerializer(serializers.ModelSerializer):
+    profile_image = ImageProfileSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'profile_image')
 
 
 class UserLoginSerializer(serializers.Serializer):

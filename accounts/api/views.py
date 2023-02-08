@@ -1,15 +1,16 @@
 from django.core.cache import cache
-from rest_framework import status
-from rest_framework.permissions import AllowAny
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from accounts.models import User
+
 from accounts.api import serializers
+from accounts.models import User
 from accounts.otp_service import OTP
 
 
 class UserLoginView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = serializers.UserLoginSerializer(data=request.data)
@@ -19,7 +20,7 @@ class UserLoginView(APIView):
 
 
 class UserRegisterView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = serializers.UserRegisterSerializer(data=request.data)
@@ -34,7 +35,7 @@ class UserRegisterView(APIView):
 
 
 class GetOTPRegisterCodeView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = serializers.GetOTPRegisterCodeSerializer(data=request.data)
@@ -54,3 +55,11 @@ class GetOTPRegisterCodeView(APIView):
             return Response({'error': 'this code not exist or invalid', 'success': False}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
 
+
+class UserProfileView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        user = get_object_or_404(User, id=pk)
+        serializer = serializers.UserSerializer(instance=user)
+        return Response(serializer.data, status=status.HTTP_200_OK)

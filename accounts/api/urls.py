@@ -16,5 +16,9 @@ urlpatterns = [
     # register URL
     path('register', views.UserRegisterView.as_view(), name='register'),
     path('check', views.GetOTPRegisterCodeView.as_view(), name='check-otp'),
+
+    # user URL
+    path('profile/<int:pk>', views.UserProfileView.as_view(), name='profile'),
+
     
 ]

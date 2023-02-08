@@ -5,11 +5,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import User, ImageProfile
 
 
-
 class ImageProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageProfile
         fields = ('image',)
+
 
 class UserSerializer(serializers.ModelSerializer):
     profile_image = ImageProfileSerializer(many=False, read_only=True)
@@ -17,6 +17,21 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'profile_image')
+
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=False)
+
+    class Meta:
+        model = User
+        fields = ('profile_image', 'username')
+
+    def validate_username(self, value):
+        user = User.objects.filter(username=value)
+        if user:
+            raise serializers.ValidationError({'error': 'this username exist'})
+        else:
+            return value
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -53,7 +68,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password_validation.validate_password(value, self.instance)
         except serializers.ValidationError as error:
             self.add_error('password', error)
-        return value    
+        return value
 
 
 class GetOTPRegisterCodeSerializer(serializers.Serializer):

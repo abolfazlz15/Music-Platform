@@ -57,9 +57,21 @@ class GetOTPRegisterCodeView(APIView):
 
 
 class UserProfileView(APIView):
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
         user = get_object_or_404(User, id=pk)
         serializer = serializers.UserSerializer(instance=user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserUpdateProfileView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        serializer = serializers.UserProfileUpdateSerializer(instance=user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

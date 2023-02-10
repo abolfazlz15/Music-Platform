@@ -81,3 +81,16 @@ class GetOTPRegisterCodeSerializer(serializers.Serializer):
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         })
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=False)
+    new_password = serializers.CharField(required=False)
+
+    def validate_new_password(self, value):
+        # use django validation for password
+        try:
+            password_validation.validate_password(value, self.instance)
+        except serializers.ValidationError as error:
+            self.add_error('password', error)
+        return value

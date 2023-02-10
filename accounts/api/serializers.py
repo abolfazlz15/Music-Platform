@@ -88,7 +88,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=False)
 
     def validate_new_password(self, value):
-        # use django validation for password
+        # use django validation for password 
         try:
             password_validation.validate_password(value, self.instance)
         except serializers.ValidationError as error:

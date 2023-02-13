@@ -30,7 +30,7 @@ INSTALLED_APPS = [
 
     # my helper apps
     'django_cleanup.apps.CleanupConfig',
-    'ckeditor ',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [

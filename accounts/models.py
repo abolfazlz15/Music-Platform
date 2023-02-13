@@ -20,7 +20,7 @@ class User(AbstractBaseUser):
         unique=True,
     )
     username = models.CharField(unique=True, max_length=100, verbose_name=_('username'))
-    profile_image = models.ForeignKey(ImageProfile, null=True, blank=True, on_delete=models.SET_NULL, related_name='users', verbose_name=_('profile image'))
+    profile_image = models.ForeignKey(ImageProfile, null=True, blank=True, on_delete=models.SET_NULL, related_name='users', verbose_name=_('image/profile_image'))
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
@@ -46,3 +46,9 @@ class User(AbstractBaseUser):
         return self.is_admin
 
 
+class Artist(models.Model):
+    image = models.ImageField(upload_to='artist_profile/', null=True, blank=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name

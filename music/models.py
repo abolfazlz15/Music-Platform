@@ -14,9 +14,9 @@ class Category(models.Model):
         return self.title
 
 
-class Music(models.model):
+class Music(models.Model):
     MUSIC_TYPE = (
-        ('International', 'بینالمللی'),
+        ('International', 'بین المللی'),
         ('Iranian', 'ایرانی'),
     )
     title = models.CharField(max_length=150)
@@ -25,9 +25,10 @@ class Music(models.model):
     cover = models.ImageField(upload_to='image/music_cover', null=True, blank=True, verbose_name=_('music cover'))
     text = RichTextField(verbose_name=_('text'), null=True, blank=True)
     category = models.ManyToManyField(Category, related_name='musics', verbose_name=_('category'))
-    type = models.CharField(choices=MUSIC_TYPE, null=True, blank=True, default=1, verbose_name=_('type'))
+    type = models.CharField(choices=MUSIC_TYPE, null=True, blank=True, default='Iranian', max_length=30, verbose_name=_('type'))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    status = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.title} - {self.artist.name}'

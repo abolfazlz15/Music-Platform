@@ -47,8 +47,8 @@ class User(AbstractBaseUser):
 
 
 class Artist(models.Model):
-    image = models.ImageField(upload_to='artist_profile/', null=True, blank=True)
     name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='artist_profile/', null=True, blank=True)
 
     def __str__(self):
         return self.name

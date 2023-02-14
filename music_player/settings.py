@@ -27,6 +27,7 @@ INSTALLED_APPS = [
 
     # my apps
     'accounts.apps.AccountsConfig',
+    'music.apps.MusicConfig',
 
     # my helper apps
     'django_cleanup.apps.CleanupConfig',

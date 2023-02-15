@@ -1,9 +1,10 @@
+from ckeditor.fields import RichTextField
 from django.db import models
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Artist, User
-from django.utils.translation import gettext_lazy as _
-from ckeditor.fields import RichTextField
+
 
 
 class Category(models.Model):
@@ -49,3 +50,10 @@ class FavoriteMusic(models.Model):
 
     def __str__(self):
         return f'{self.music.title} - {self.user.username}'
+
+
+class ChooseMusicByCategory(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.category.title

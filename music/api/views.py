@@ -3,12 +3,30 @@ from rest_framework import generics
 from rest_framework.views import APIView
 
 from music.api import serializers
-from music.models import Music
-
+from music.models import Music, Category, Test as testModel
+from music.api import filters
 
 class PopularMusicListView(generics.ListAPIView):
-    serializer_class = serializers.ArticleListSerializer
+    serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
-        queryset = Music.objects.annotate(num_likes=Count('favorite_musics')).order_by('-num_likes')[:1]
+        queryset = Music.objects.annotate(num_likes=Count('favorite_musics')).filter(status=True).order_by('-num_likes')[:1]
+        return queryset
+
+
+class RecentMusicListView(generics.ListAPIView):
+    serializer_class = serializers.MusicListSerializer
+    filterset_class = filters.ItemFilter
+
+    def get_queryset(self):
+        queryset = Music.objects.filter(status=True).order_by('-created_at')
+        return queryset
+
+
+class MusicByCategoryListView(generics.ListAPIView):
+    serializer_class = serializers.MusicListSerializer
+    
+    def get_queryset(self):
+        category_object = testModel.objects.last()
+        queryset = Music.objects.filter(status=True).filter(category__id=category_object.category.id)
         return queryset

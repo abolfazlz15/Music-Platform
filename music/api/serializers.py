@@ -2,7 +2,9 @@ from rest_framework import serializers
 
 from music.models import Music
 
-class ArticleListSerializer(serializers.ModelSerializer):
+
+
+class MusicListSerializer(serializers.ModelSerializer):
     artist = serializers.SlugRelatedField(slug_field='name', read_only=True)
     class Meta:
         model = Music

@@ -1,10 +1,9 @@
 from django.db.models import Count
 from rest_framework import generics
-from rest_framework.views import APIView
 
 from music.api import serializers
-from music.models import Music, Category, Test as testModel
-from music.api import filters
+from music.models import ChooseMusicByCategory, Music
+
 
 class PopularMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
@@ -16,7 +15,6 @@ class PopularMusicListView(generics.ListAPIView):
 
 class RecentMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
-    filterset_class = filters.ItemFilter
 
     def get_queryset(self):
         queryset = Music.objects.filter(status=True).order_by('-created_at')
@@ -27,6 +25,14 @@ class MusicByCategoryListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
     
     def get_queryset(self):
-        category_object = testModel.objects.last()
+        category_object = ChooseMusicByCategory.objects.last()
         queryset = Music.objects.filter(status=True).filter(category__id=category_object.category.id)
+        return queryset
+
+
+class MusicByTrendCategoryListView(generics.ListAPIView):
+    serializer_class = serializers.MusicListSerializer
+    
+    def get_queryset(self):
+        queryset = Music.objects.filter(status=True).filter(category__title='trend')
         return queryset

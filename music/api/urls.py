@@ -9,4 +9,5 @@ urlpatterns = [
     path('morelike/', views.PopularMusicListView.as_view(), name='popular_music'),
     path('recentmusic/', views.RecentMusicListView.as_view(), name='recent_music'),
     path('musicbycategory/', views.MusicByCategoryListView.as_view(), name='music_by_category'),
+    path('trendmusic/', views.MusicByTrendCategoryListView.as_view(), name='music_by_trend_category'),
 ]

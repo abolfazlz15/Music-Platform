@@ -4,7 +4,7 @@ from rest_framework import generics
 from music.api import serializers
 from music.models import ChooseMusicByCategory, Music
 
-
+# Home API Views
 class PopularMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
@@ -17,7 +17,7 @@ class RecentMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
-        queryset = Music.objects.filter(status=True).order_by('-created_at')
+        queryset = Music.objects.published().order_by('-created_at')
         return queryset
 
 
@@ -26,7 +26,7 @@ class MusicByCategoryListView(generics.ListAPIView):
     
     def get_queryset(self):
         category_object = ChooseMusicByCategory.objects.last()
-        queryset = Music.objects.filter(status=True).filter(category__id=category_object.category.id)
+        queryset = Music.objects.published().filter(category__id=category_object.category.id)
         return queryset
 
 
@@ -34,5 +34,5 @@ class MusicByTrendCategoryListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
     
     def get_queryset(self):
-        queryset = Music.objects.filter(status=True).filter(category__title='trend')
+        queryset = Music.objects.published().filter(category__title='trend')
         return queryset

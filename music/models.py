@@ -2,7 +2,7 @@ from ckeditor.fields import RichTextField
 from django.db import models
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-
+from music.managers import MusicManager
 from accounts.models import Artist, User
 
 
@@ -30,6 +30,7 @@ class Music(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True)
+    objects = MusicManager()
 
     def __str__(self):
         return f'{self.title} - {self.artist.name}'

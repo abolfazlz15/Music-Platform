@@ -17,6 +17,18 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+LOCAL_APPS = [
+    'accounts.apps.AccountsConfig',
+    'music.apps.MusicConfig',
+
+]
+
+THIRD_PARTY_APPS = [
+    'rest_framework',
+    'django_cleanup.apps.CleanupConfig',
+    'ckeditor',
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,13 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # my apps
-    'accounts.apps.AccountsConfig',
-    'music.apps.MusicConfig',
+    *THIRD_PARTY_APPS,
+    *LOCAL_APPS,
 
-    # my helper apps
-    'django_cleanup.apps.CleanupConfig',
-    'ckeditor',
 ]
 
 MIDDLEWARE = [

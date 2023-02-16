@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from music.models import Music
+from music.models import Music, HomeSlider
 
 
 
@@ -11,3 +11,7 @@ class MusicListSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'artist', 'cover')
 
 
+class SliderHomePageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomeSlider
+        fields = '__all__'

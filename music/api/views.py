@@ -2,7 +2,8 @@ from django.db.models import Count
 from rest_framework import generics
 
 from music.api import serializers
-from music.models import ChooseMusicByCategory, Music
+from music.models import ChooseMusicByCategory, HomeSlider, Music
+
 
 # Home API Views
 class PopularMusicListView(generics.ListAPIView):
@@ -35,4 +36,11 @@ class MusicByTrendCategoryListView(generics.ListAPIView):
     
     def get_queryset(self):
         queryset = Music.objects.published().filter(category__title='trend')
+        return queryset
+
+class SliderHomePage(generics.ListAPIView):
+    serializer_class = serializers.SliderHomePageSerializer
+    
+    def get_queryset(self):
+        queryset = HomeSlider.objects.filter(status=True)
         return queryset

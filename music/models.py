@@ -58,3 +58,9 @@ class ChooseMusicByCategory(models.Model):
 
     def __str__(self):
         return self.category.title
+
+
+class HomeSlider(models.Model):
+    image = models.ImageField(upload_to='image/home_slider_image', null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
+    status = models.BooleanField(default=True)

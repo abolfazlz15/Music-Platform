@@ -17,7 +17,7 @@ class PopularMusicListView(generics.ListAPIView):
         return queryset
 
 
-class RecentMusicListView(generics.ListAPIView):
+class RecentMusicListView(generics.ListAPIView):  
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.MusicListSerializer
 
@@ -28,12 +28,18 @@ class RecentMusicListView(generics.ListAPIView):
 
 class MusicByCategoryListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = serializers.MusicListSerializer
+    serializer_class = serializers.MusicByCategorySerializer
 
     def get_queryset(self):
         category_object = ChooseMusicByCategory.objects.last()
         queryset = Music.objects.published().filter(category__id=category_object.category.id)
         return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        category_object = ChooseMusicByCategory.objects.last()
+        context['category_name'] = category_object.category.title
+        return context
 
 
 class MusicByTrendCategoryListView(generics.ListAPIView):
@@ -43,6 +49,7 @@ class MusicByTrendCategoryListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = Music.objects.published().filter(category__title='trend')
         return queryset
+
 
 class SliderHomePage(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]

@@ -60,3 +60,9 @@ class SliderHomePageSerializer(serializers.ModelSerializer):
     class Meta:
         model = HomeSlider
         fields = '__all__'
+
+
+class CategoryListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'

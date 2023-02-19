@@ -8,8 +8,8 @@ from accounts.models import Artist, User
 
 
 class Category(models.Model):
-    title = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='image/category_image')
+    title = models.CharField(max_length=100, verbose_name=_('title'))
+    image = models.ImageField(upload_to='image/category_image', verbose_name=_('image'))
 
     def __str__(self):
         return self.title

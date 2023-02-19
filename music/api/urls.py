@@ -14,4 +14,7 @@ urlpatterns = [
 
     path('detail/<int:pk>/', views.MusicDetailView.as_view(), name='music_detail'),
 
+    # category URL
+    path('category/', views.CateogryListView.as_view(), name='category_list'),
+
 ]

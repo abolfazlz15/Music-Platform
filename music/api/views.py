@@ -1,10 +1,9 @@
 from django.db.models import Count
-from rest_framework import generics
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework import permissions, status
 
 from music.api import serializers
-from music.models import ChooseMusicByCategory, HomeSlider, Music
+from music.models import ChooseMusicByCategory, HomeSlider, Music, Category
 
 
 # Home API Views
@@ -69,3 +68,12 @@ class MusicDetailView(generics.GenericAPIView):
         serializer = serializers.MusicDetailSerializer(instance=instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class CateogryListView(generics.ListAPIView):
+    # permission_classes = [permissions.IsAuthenticated]
+
+    serializer_class = serializers.CategoryListSerializer
+
+    def get_queryset(self):
+        queryset = Category.objects.all()
+        return queryset

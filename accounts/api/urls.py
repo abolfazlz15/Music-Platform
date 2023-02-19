@@ -24,5 +24,8 @@ urlpatterns = [
     # change password URL
     path('password/update', views.ChangePasswordView.as_view(), name='password-update'),
 
+    # artist
+    path('profile/artist/<int:pk>', views.ArtistProfileView.as_view(), name='profile-artist'),
+
 
 ]

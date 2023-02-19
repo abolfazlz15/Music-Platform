@@ -2,8 +2,9 @@ from django.contrib.auth import authenticate, password_validation
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from accounts.models import User, ImageProfile
-
+from accounts.models import Artist, ImageProfile, User
+from music.api.serializers import MusicListSerializer
+from django.db.models import Count
 
 class ImageProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -94,3 +95,26 @@ class ChangePasswordSerializer(serializers.Serializer):
         except serializers.ValidationError as error:
             self.add_error('password', error)
         return value
+
+
+class ArtistSerializer(serializers.ModelSerializer):
+    music_quantity = serializers.SerializerMethodField()
+    recent_music = serializers.SerializerMethodField()
+    popular_music = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Artist
+        fields = ('id', 'name', 'image', 'music_quantity', 'recent_music', 'popular_music')
+
+    def get_music_quantity(self, artist):
+        return artist.musics.count()
+
+    def get_recent_music(self, artist):
+        # Get the 3 most recently added music tracks
+        musics = artist.musics.order_by('-created_at')[:3]
+        return MusicListSerializer(musics, many=True).data
+
+    def get_popular_music(self, artist):
+        # Get the 3 most popular music tracks based on the number of times they have been played
+        musics = artist.musics.annotate(play_count=Count('favorite_musics')).filter(status=True).order_by('-play_count')[:3]
+        return MusicListSerializer(musics, many=True).data

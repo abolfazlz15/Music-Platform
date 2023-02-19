@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.api import serializers
-from accounts.models import User
+from accounts.models import User, Artist
 from accounts.otp_service import OTP
 
 
@@ -110,3 +110,11 @@ class ChangePasswordView(UpdateAPIView):
                 return Response(response)
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ArtistProfileView(APIView):
+    def get(self, request, pk):
+        instance = Artist.objects.get(id=pk)
+        serializer = serializers.ArtistSerializer(instance=instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+

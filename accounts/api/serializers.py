@@ -118,3 +118,9 @@ class ArtistSerializer(serializers.ModelSerializer):
         # Get the 3 most popular music tracks
         musics = artist.musics.annotate(play_count=Count('favorite_musics')).filter(status=True).order_by('-play_count')[:3]
         return MusicListSerializer(musics, many=True).data
+
+
+class ArtistListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Artist
+        fields = ('id', 'name', 'image')

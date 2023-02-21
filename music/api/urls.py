@@ -12,6 +12,8 @@ urlpatterns = [
     path('trendmusic/', views.MusicByTrendCategoryListView.as_view(), name='music_by_trend_category'),
     path('sliderhomepage/', views.SliderHomePage.as_view(), name='slider_home_page'),
 
+    path('internationals/', views.InternationalMusicList.as_view(), name='international_music'),
+
     path('detail/<int:pk>/', views.MusicDetailView.as_view(), name='music_detail'),
 
     # category URL

@@ -77,3 +77,10 @@ class CateogryListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = Category.objects.all()
         return queryset
+
+
+class InternationalMusicList(generics.ListAPIView):
+    serializer_class = serializers.MusicListSerializer
+    queryset = Music.objects.published().filter(type='International')
+    
+   

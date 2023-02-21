@@ -26,6 +26,7 @@ urlpatterns = [
 
     # artist
     path('profile/artist/<int:pk>', views.ArtistProfileView.as_view(), name='profile-artist'),
+    path('artists/', views.ArtistListView.as_view(), name='artist-all'),
 
 
 ]

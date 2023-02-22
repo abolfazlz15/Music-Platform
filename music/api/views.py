@@ -3,7 +3,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
 from music.api import serializers
-from music.models import ChooseMusicByCategory, HomeSlider, Music, Category
+from music.models import ChooseMusicByCategory, HomeSlider, Music, Category, FavoriteMusic
 
 
 # Home API Views
@@ -31,13 +31,19 @@ class MusicByCategoryListView(generics.ListAPIView):
 
     def get_queryset(self):
         category_object = ChooseMusicByCategory.objects.last()
-        queryset = Music.objects.published().filter(category__id=category_object.category.id)
-        return queryset
+        if category_object is None:
+            return Music.objects.none()
+        else:
+            queryset = Music.objects.published().filter(category__id=category_object.category.id)
+            return queryset
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         category_object = ChooseMusicByCategory.objects.last()
-        context['category_name'] = category_object.category.title
+        if category_object is None:
+            context['category_name'] = "None"
+        else:
+            context['category_name'] = category_object.category.title
         return context
 
 
@@ -84,3 +90,12 @@ class InternationalMusicList(generics.ListAPIView):
     queryset = Music.objects.published().filter(type='International')
     
    
+class UserFavoriteMusicView(generics.ListAPIView):
+    serializer_class = serializers.MusicListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        favorite_music_ids = FavoriteMusic.objects.filter(user=user).values_list('music_id', flat=True)
+        return Music.objects.filter(id__in=favorite_music_ids) 
+
+

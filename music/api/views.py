@@ -96,6 +96,6 @@ class UserFavoriteMusicView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         favorite_music_ids = FavoriteMusic.objects.filter(user=user).values_list('music_id', flat=True)
-        return Music.objects.filter(id__in=favorite_music_ids) 
+        return Music.objects.filter(id__in=favorite_music_ids)
 
 

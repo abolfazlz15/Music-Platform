@@ -1,68 +1,53 @@
 from rest_framework import serializers
 
-from accounts.models import Artist
+from accounts.models import Artist, User
 from music.models import Category, HomeSlider, Music
+from play_list.models import Playlist
 
-
-class ArtistSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Artist
-        fields = ('id', 'name')
+        model = User
+        fields = ('id', 'username')
 
 
-class MusicByCategorySerializer(serializers.ModelSerializer):
-    category_name = serializers.StringRelatedField(source='category')
-    artist = serializers.SlugRelatedField(slug_field='name', read_only=True)
-
-    
-    class Meta:
-        model = Music
-        fields = ('id', 'title', 'artist', 'cover', 'category_name')
-        
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        category_name = self.context.get('category_name')
-        representation['category_name'] = category_name
-        return representation
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ('id', 'title')
-
-
-class MusicListSerializer(serializers.ModelSerializer):
-    artist = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    class Meta:
-        model = Music
-        fields = ('id', 'title', 'artist', 'cover')
-
-
-class MusicDetailSerializer(serializers.ModelSerializer):
-    artist = serializers.SerializerMethodField()
-    category = serializers.SerializerMethodField()
+class PlayListSerializer(serializers.ModelSerializer):
+    # user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    user = serializers.SerializerMethodField()
 
     class Meta:
-        model = Music
-        fields = ('id', 'title', 'artist', 'cover', 'text', 'category')
+        model = Playlist
+        fields = ('id', 'name', 'user')
 
-    def get_artist(self, obj):
-        serializer = ArtistSerializer(instance=obj.artist.all(), many=True)
+    def get_user(self, obj):
+        serializer = UserSerializer(instance=obj.user)
         return serializer.data
 
-    def get_category(self, obj):
-        serializer = CategorySerializer(instance=obj.category.all(), many=True)
-        return serializer.data
+# class MusicDetailSerializer(serializers.ModelSerializer):
+#     artist = serializers.SerializerMethodField()
+#     category = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = Music
+#         fields = ('id', 'title', 'artist', 'cover', 'text', 'category')
+
+#     def get_artist(self, obj):
+#         serializer = ArtistSerializer(instance=obj.artist.all(), many=True)
+#         return serializer.data
+
+#     def get_category(self, obj):
+#         serializer = CategorySerializer(instance=obj.category.all(), many=True)
+#         return serializer.data
 
 
-class SliderHomePageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = HomeSlider
-        fields = '__all__'
+# class SliderHomePageSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = HomeSlider
+#         fields = '__all__'
 
 
-class CategoryListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
+# class CategoryListSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Category
+#         fields = '__all__'

@@ -20,7 +20,7 @@ ALLOWED_HOSTS = []
 LOCAL_APPS = [
     'accounts.apps.AccountsConfig',
     'music.apps.MusicConfig',
-    'playlist.apps.PlayListConfig',
+    'play_list.apps.PlayListConfig',
 
 ]
 

@@ -1,8 +1,10 @@
 from rest_framework import serializers
 
 from accounts.models import Artist, User
-from music.models import Category, HomeSlider, Music
+from music.api.serializers import MusicListSerializer
+from music.models import Music
 from play_list.models import Playlist
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,8 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PlayListSerializer(serializers.ModelSerializer):
-    # user = serializers.SlugRelatedField(slug_field='username', read_only=True)
-    user = serializers.SerializerMethodField()
+    id = serializers.IntegerField(read_only=True)
+    user = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Playlist
@@ -24,30 +26,22 @@ class PlayListSerializer(serializers.ModelSerializer):
         serializer = UserSerializer(instance=obj.user)
         return serializer.data
 
-# class MusicDetailSerializer(serializers.ModelSerializer):
-#     artist = serializers.SerializerMethodField()
-#     category = serializers.SerializerMethodField()
+class PlayListDetailSerializer(serializers.ModelSerializer):
+    music = serializers.SerializerMethodField()
 
-#     class Meta:
-#         model = Music
-#         fields = ('id', 'title', 'artist', 'cover', 'text', 'category')
+    class Meta:
+        model = Playlist
+        fields = ('id', 'name', 'music')
 
-#     def get_artist(self, obj):
-#         serializer = ArtistSerializer(instance=obj.artist.all(), many=True)
-#         return serializer.data
-
-#     def get_category(self, obj):
-#         serializer = CategorySerializer(instance=obj.category.all(), many=True)
-#         return serializer.data
+    def get_music(self, obj):
+        serializer = MusicListSerializer(instance=obj.songs.all(), many=True)
+        return serializer.data
 
 
-# class SliderHomePageSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = HomeSlider
-#         fields = '__all__'
 
+class PlayListCreateSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(required=False)
+    class Meta:
+        model = Playlist
+        fields = ('name', 'user')
 
-# class CategoryListSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Category
-#         fields = '__all__'

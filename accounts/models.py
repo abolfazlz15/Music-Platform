@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -13,7 +13,7 @@ class ImageProfile(models.Model):
         return self.title
 
 
-class User(AbstractBaseUser):
+class User(PermissionsMixin, AbstractBaseUser):
     email = models.EmailField(
         verbose_name=_('email address'),
         max_length=255,

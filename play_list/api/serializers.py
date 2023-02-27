@@ -12,8 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username')
 
 
-
-
 class PlayListSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     user = serializers.SerializerMethodField(read_only=True)
@@ -26,6 +24,7 @@ class PlayListSerializer(serializers.ModelSerializer):
         serializer = UserSerializer(instance=obj.user)
         return serializer.data
 
+
 class PlayListDetailSerializer(serializers.ModelSerializer):
     music = serializers.SerializerMethodField()
 
@@ -36,7 +35,6 @@ class PlayListDetailSerializer(serializers.ModelSerializer):
     def get_music(self, obj):
         serializer = MusicListSerializer(instance=obj.songs.all(), many=True)
         return serializer.data
-
 
 
 class PlayListCreateSerializer(serializers.ModelSerializer):

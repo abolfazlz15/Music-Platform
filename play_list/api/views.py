@@ -2,6 +2,7 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from play_list.api import permissions as custom_permissions
 from play_list.api import serializers
 from play_list.models import Playlist
 
@@ -35,3 +36,18 @@ class UserCreatePlayListView(APIView):
             serializer.save()
             return Response({'result': 'playlist created'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class UserUpdatePlayListView(APIView):
+    serializer_class = serializers.PlayListCreateSerializer
+    permission_classes = [custom_permissions.IsAuthorOrReadOnly]
+    
+    def put(self, request, pk):
+        instance = Playlist.objects.get(id=pk)
+        self.check_object_permissions(request, instance)
+        serializer = self.serializer_class(instance=instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'result': 'playlist updated'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        

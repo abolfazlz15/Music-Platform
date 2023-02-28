@@ -17,6 +17,8 @@ urlpatterns = [
 
     path('detail/<int:pk>/', views.MusicDetailView.as_view(), name='music_detail'),
 
+    path('search/', views.MusicSearchView.as_view(), name='test'),
+
     # category URL
     path('category/', views.CateogryListView.as_view(), name='category_list'),
 

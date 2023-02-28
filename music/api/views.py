@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from music.api import serializers
 from music.models import ChooseMusicByCategory, HomeSlider, Music, Category, FavoriteMusic
 
+from rest_framework.filters import SearchFilter
 
 # Home API Views
 class PopularMusicListView(generics.ListAPIView):
@@ -99,3 +100,8 @@ class UserFavoriteMusicView(generics.ListAPIView):
         return Music.objects.filter(id__in=favorite_music_ids)
 
 
+class MusicSearchView(generics.ListAPIView):
+    queryset = Music.objects.published()
+    serializer_class = serializers.MusicListSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['title']

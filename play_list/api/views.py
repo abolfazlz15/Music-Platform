@@ -1,7 +1,7 @@
-from rest_framework import permissions, status, viewsets
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.shortcuts import get_object_or_404
 from play_list.api import permissions as custom_permissions
 from play_list.api import serializers
 from play_list.models import Playlist
@@ -50,4 +50,15 @@ class UserUpdatePlayListView(APIView):
             serializer.save()
             return Response({'result': 'playlist updated'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+
+class DeletePlayListView(APIView):
+
+    def delete(self, request, pk):
+        self.permission_classes = [custom_permissions.IsAuthorOrReadOnly]
+        playlist = get_object_or_404(Playlist, id=pk)
+        self.check_object_permissions(request, playlist)
+
+        playlist.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+

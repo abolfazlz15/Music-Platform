@@ -1,9 +1,9 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from django.utils import timezone
 from accounts.managers import UserManager
-
+from utils.date_conversion.utils import jajali_converter
 
 class ImageProfile(models.Model):
     title = models.CharField(max_length=100, verbose_name=_('title'))
@@ -23,7 +23,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     profile_image = models.ForeignKey(ImageProfile, null=True, blank=True, on_delete=models.SET_NULL, related_name='users', verbose_name=_('image/profile_image'))
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-
+    register_at = models.DateTimeField(auto_now_add=True, null=True)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -39,6 +39,10 @@ class User(PermissionsMixin, AbstractBaseUser):
     def has_module_perms(self, app_label):
         # Simplest possible answer: Yes, always
         return True
+    
+    def get_jalali_date(self):
+        return jajali_converter(self.register_at)
+    get_jalali_date.short_description = 'تاریخ عضویت'
 
     @property
     def is_staff(self):

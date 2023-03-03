@@ -1,6 +1,7 @@
 asgiref==3.6.0
 autopep8==2.0.1
 Django==4.1.6
+django-admin-persian-fonts==0.2
 django-ckeditor==6.5.1
 django-cleanup==6.0.0
 django-js-asset==2.0.0
@@ -10,6 +11,7 @@ Pillow==9.4.0
 pycodestyle==2.10.0
 PyJWT==2.6.0
 pytz==2022.7.1
+six==1.16.0
 sqlparse==0.4.3
 tomli==2.0.1
 tzdata==2022.7

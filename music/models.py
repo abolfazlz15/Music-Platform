@@ -14,6 +14,14 @@ class Category(models.Model):
     def __str__(self):
         return self.title
 
+    def show_cover(self):
+        # show cover in admin panel
+        if self.image:
+            return format_html(f'<img src="{self.image.url}" alt="" width="50px" height="50px">')
+        else:
+            return format_html('no cover')
+
+    show_cover.short_description = 'cover'
 
 class Music(models.Model):
     MUSIC_TYPE = (

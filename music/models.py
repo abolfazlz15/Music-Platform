@@ -10,7 +10,11 @@ from accounts.models import Artist, User
 class Category(models.Model):
     title = models.CharField(max_length=100, verbose_name=_('title'))
     image = models.ImageField(upload_to='image/category_image', verbose_name=_('image'))
-
+    
+    class Meta:
+        verbose_name = 'دستبندی'
+        verbose_name_plural = 'دستبندی ها'
+    
     def __str__(self):
         return self.title
 
@@ -40,6 +44,10 @@ class Music(models.Model):
     status = models.BooleanField(default=True)
     objects = MusicManager()
 
+    class Meta:
+        verbose_name = 'موزیک'
+        verbose_name_plural = 'موزیک ها'
+        
     def __str__(self):
         return f'{self.title} - {self.artist.name}'
 

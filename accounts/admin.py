@@ -18,25 +18,44 @@ class UserAdmin(BaseUserAdmin):
         if db_field.name == 'is_superuser' and not request.user.is_superuser:
             field.widget = forms.HiddenInput()
         return field
-    
-    def get_form(self, request, obj=None, **kwargs):
-        obj = super().get_form(request, obj, **kwargs)
-        
-        is_superuser = request.user.is_superuser
-        if not is_superuser:
-            obj.base_fields['is_admin'].disabled = True
 
+    def has_delete_permission(self, request, obj=None):
+        if obj is not None and request.user.is_superuser == False:
+            if obj is not None and request.user.is_admin and obj.is_admin:
+                return False
+            else:
+                return True
+        else:
+            return True
 
-        elif obj and not obj.is_superuser :
-            obj.base_fields['is_active'].disabled = True
-            obj.base_fields['is_active'].help_text = "You do not have permission to change this field for other admins."    
-        return obj
+    def has_change_permission(self, request, obj=None):
+        if obj is not None and request.user.is_superuser == False:
+            if obj is not None and request.user.is_admin and obj.is_admin:
+                return False
+            else:
+                return True
+        else:
+            return True
 
-    list_display = ('email', 'username', 'is_admin', 'is_active', 'get_jalali_date')
+    def get_fieldsets(self, request, obj=None):
+        if not obj:
+            return self.add_fieldsets
+        if not request.user.is_superuser:
+            return (
+                (None, {'fields': ('email', 'password')}),
+                ('Personal info', {'fields': ('username',
+                 'profile_image', 'get_jalali_date')}),
+                ('Permissions', {'fields': ('is_active',)}),
+            )
+        return super().get_fieldsets(request, obj)
+
+    list_display = ('email', 'username', 'is_admin',
+                    'is_active', 'get_jalali_date')
     list_filter = ('is_admin', 'is_active', 'is_superuser')
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('username', 'profile_image', 'get_jalali_date')}),
+        ('Personal info', {'fields': ('username',
+         'profile_image', 'get_jalali_date')}),
         ('Permissions', {'fields': ('is_admin', 'is_active', 'is_superuser')}),
     )
     readonly_fields = ('get_jalali_date',)
@@ -51,12 +70,8 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
-
-
 admin.site.register(User, UserAdmin)
 admin.site.register(ImageProfile)
-
-
 admin.site.register(Artist)
 
 admin.site.unregister(Group)

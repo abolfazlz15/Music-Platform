@@ -8,11 +8,14 @@ from rest_framework.views import APIView
 from accounts.api import serializers
 from accounts.models import Artist, User
 from accounts.otp_service import OTP
+from drf_yasg.utils import swagger_auto_schema
+
 
 
 class UserLoginView(APIView):
     permission_classes = [permissions.AllowAny]
-
+    serializer_class = serializers.UserLoginSerializer
+    @swagger_auto_schema(request_body=serializers.UserLoginSerializer)
     def post(self, request):
         serializer = serializers.UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

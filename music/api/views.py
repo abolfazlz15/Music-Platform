@@ -69,7 +69,7 @@ class SliderHomePage(generics.ListAPIView):
 
 class MusicDetailView(generics.GenericAPIView):
     # permission_classes = [permissions.IsAuthenticated]
-
+    serializer_class = serializers.MusicDetailSerializer
     def get(self, request, pk):
         instance = Music.objects.get(id=pk)
         serializer = serializers.MusicDetailSerializer(instance=instance)

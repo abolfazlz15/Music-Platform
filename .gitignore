@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,django,visualstudiocode,pycharm,venv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,django,visualstudiocode,pycharm,venv
 
+# my ignore
+static/
+
 ### Django ###
 *.log
 *.pot

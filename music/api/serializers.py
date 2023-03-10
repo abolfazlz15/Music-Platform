@@ -33,7 +33,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class MusicListSerializer(serializers.ModelSerializer):
-    artist = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    artist = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
     class Meta:
         model = Music
         fields = ('id', 'title', 'artist', 'cover')

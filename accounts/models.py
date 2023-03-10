@@ -8,6 +8,10 @@ from utils.date_conversion.utils import jajali_converter
 class ImageProfile(models.Model):
     title = models.CharField(max_length=100, verbose_name=_('title'))
     image = models.ImageField(upload_to='profile_image', verbose_name=_('image profile'))   
+    
+    class Meta:
+        verbose_name = 'عکس پروفایل'
+        verbose_name_plural = 'عکس پروفایل ها'
 
     def __str__(self):
         return self.title
@@ -28,6 +32,10 @@ class User(PermissionsMixin, AbstractBaseUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
+
+    class Meta:
+        verbose_name = 'کاربر'
+        verbose_name_plural = 'کاربران'
 
     def __str__(self):
         return self.email
@@ -53,6 +61,9 @@ class User(PermissionsMixin, AbstractBaseUser):
 class Artist(models.Model):
     name = models.CharField(max_length=50)
     image = models.ImageField(upload_to='artist_profile/', null=True, blank=True)
-
+    class Meta:
+        verbose_name = 'هنرمتد'
+        verbose_name_plural = 'هنرمندان'
+        
     def __str__(self):
         return self.name

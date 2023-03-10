@@ -65,13 +65,20 @@ class FavoriteMusic(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_musics', verbose_name=_('user'))
     music = models.ForeignKey(Music, on_delete=models.CASCADE, related_name='favorite_musics', verbose_name=_('music'))
 
+    class Meta:
+        verbose_name = 'موزیک لایک شده کاربر'
+        verbose_name_plural = 'موزیک های لایک شده کاربر'
+
     def __str__(self):
         return f'{self.music.title} - {self.user.username}'
 
 
 class ChooseMusicByCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
-
+    
+    class Meta:
+        verbose_name = 'نمایش موزیک بر اساس دسته بندی در صفحه خانه'
+        verbose_name_plural = 'نمایش موزیک بر اساس دسته بندی در صفحه خانه'
     def __str__(self):
         return self.category.title
 
@@ -80,3 +87,7 @@ class HomeSlider(models.Model):
     image = models.ImageField(upload_to='image/home_slider_image', null=True, blank=True)
     url = models.URLField(null=True, blank=True)
     status = models.BooleanField(default=True)
+    
+    class Meta:
+        verbose_name = 'اسلایدر صفحه خانه'
+        verbose_name_plural = 'اسلایدر های صفحه خانه'

@@ -12,7 +12,7 @@ class ArtistSerializer(serializers.ModelSerializer):
 
 class MusicByCategorySerializer(serializers.ModelSerializer):
     category_name = serializers.StringRelatedField(source='category')
-    artist = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    artist = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
 
     
     class Meta:

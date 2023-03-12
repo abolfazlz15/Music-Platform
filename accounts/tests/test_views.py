@@ -110,3 +110,32 @@ class ArtistProfileViewTestCase(APITestCase):
         url = reverse('accounts:profile-artist', args=(self.artist.id,))
         response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class UserUpdateProfileViewTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.email = 'test@test.com'
+        cls.username = 'test'
+        cls.password = 'test1234'
+        cls.user = User.objects.create_user(email='test@test.com', username='test', password='test1234')
+        cls.artist = Artist.objects.create(name='testArtist')
+        refresh = RefreshToken.for_user(cls.user)
+        cls.token = str(refresh.access_token)
+
+    def test_update_user_authorized(self):
+        url = reverse('accounts:profile-update')
+        new_data = {
+            'username': 'test2',
+        }
+        response = self.client.put(url, data=new_data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], new_data['username'])
+
+    def test_update_user_unauthorized(self):
+        url = reverse('accounts:profile-update')
+        new_data = {
+            'username': 'test2',
+            }
+        response = self.client.get(url, data=new_data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

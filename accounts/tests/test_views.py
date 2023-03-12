@@ -139,3 +139,29 @@ class UserUpdateProfileViewTestCase(APITestCase):
             }
         response = self.client.get(url, data=new_data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class ChangePasswordViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email='test@test.com', username='test', password='TestPass1234')
+        self.url = reverse('accounts:password-update')
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+
+    def test_change_password_authorized(self):
+        data = {'old_password': 'TestPass1234', 'new_password': 'NewTestPass1234!'}
+        response = self.client.put(self.url, data, HTTP_AUTHORIZATION=f'Bearer {self.token}') 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_change_password_unauthorized(self):
+        data = {'old_password': 'testpass123', 'new_password': 'newtestpass123'}
+        response = self.client.put(self.url, data) 
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+    def test_wrong_old_password(self):
+        data = {'old_password': 'wrongpassword', 'new_password': 'newtestpass123'}
+        response = self.client.put(self.url, data, HTTP_AUTHORIZATION=f'Bearer {self.token}') 
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'old_password': ['Wrong password.'], 'status': False})
+

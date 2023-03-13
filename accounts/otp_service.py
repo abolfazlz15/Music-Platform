@@ -14,7 +14,7 @@ class OTP:
     def generate_otp(self, email):
         otp = randint(1000, 9999)
         cache.set(email, (otp, datetime.datetime.now()), self.otp_expiry_minutes * 60)
-        # self.send_otp(otp, email)
+        self.send_otp(otp, email)
         print(otp)
 
         return otp
@@ -38,14 +38,14 @@ class OTP:
         cache.delete(email)
 
     def send_otp(self, otp, email):
-        pass
-        # mail_subject = 'فعال سازی اکانت'
-        # message = render_to_string('accounts/active_email.html', {
-        #     'user': email,
-        #     'code': otp,
-        # })
-        # to_email = email
-        # email = EmailMessage(
-        #     mail_subject, message, to=[to_email]
-        # )
-        # email.send()
+        mail_subject = 'فعال سازی اکانت'
+        message = render_to_string('accounts/active_email.html', {
+            'user': email,
+            'code': otp,
+        })
+        to_email = email
+        email = EmailMessage(
+            mail_subject, message, to=[to_email]
+        )
+        print('test')
+        email.send()

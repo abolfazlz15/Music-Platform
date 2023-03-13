@@ -45,7 +45,7 @@ class MusicDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Music
-        fields = ('id', 'title', 'artist', 'cover', 'text', 'category')
+        fields = ('id', 'title', 'artist', 'cover', 'text', 'url', 'category')
 
     def get_artist(self, obj):
         serializer = ArtistSerializer(instance=obj.artist.all(), many=True)

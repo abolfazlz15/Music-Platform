@@ -5,9 +5,11 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.test import TestCase
 
 from accounts.models import Artist
 from accounts.otp_service import OTP
+from django.core import mail
 
 User = get_user_model()
 
@@ -165,3 +167,11 @@ class ChangePasswordViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'old_password': ['Wrong password.'], 'status': False})
 
+
+class EmailTest(TestCase):
+    def test_send_email(self):
+        mail.send_mail('Subject here', 'Here is the message.',
+            'from@example.com', ['to@example.com'],
+            fail_silently=False)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Subject here')

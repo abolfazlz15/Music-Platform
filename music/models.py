@@ -9,7 +9,7 @@ from accounts.models import Artist, User
 
 class Category(models.Model):
     title = models.CharField(max_length=100, verbose_name=_('title'))
-    image = models.ImageField(upload_to='image/category_image', verbose_name=_('image'))
+    image = models.ImageField(upload_to='image/category_image', null=True, blank=True, verbose_name=_('image'))
     
     class Meta:
         verbose_name = 'دستبندی'

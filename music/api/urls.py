@@ -19,5 +19,6 @@ urlpatterns = [
 
     # category URL
     path('category/', views.CateogryListView.as_view(), name='category_list'),
+    path('category/detail/<int:pk>', views.CategoryDetailView.as_view(), name='category_detail'),
 
 ]

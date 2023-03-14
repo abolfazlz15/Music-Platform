@@ -9,7 +9,6 @@ from rest_framework.filters import SearchFilter
 
 # Home API Views
 class PopularMusicListView(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
@@ -18,7 +17,6 @@ class PopularMusicListView(generics.ListAPIView):
 
 
 class RecentMusicListView(generics.ListAPIView):  
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
@@ -27,7 +25,6 @@ class RecentMusicListView(generics.ListAPIView):
 
 
 class MusicByCategoryListView(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.MusicByCategorySerializer
 
     def get_queryset(self):
@@ -49,7 +46,6 @@ class MusicByCategoryListView(generics.ListAPIView):
 
 
 class MusicByTrendCategoryListView(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
@@ -68,7 +64,6 @@ class SliderHomePage(generics.ListAPIView):
 
 
 class MusicDetailView(generics.GenericAPIView):
-    # permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.MusicDetailSerializer
     def get(self, request, pk):
         instance = Music.objects.get(id=pk)
@@ -77,12 +72,17 @@ class MusicDetailView(generics.GenericAPIView):
 
 
 class CateogryListView(generics.ListAPIView):
-    # permission_classes = [permissions.IsAuthenticated]
-
     serializer_class = serializers.CategoryListSerializer
 
     def get_queryset(self):
         queryset = Category.objects.all()
+        return queryset
+
+class CategoryDetailView(generics.ListAPIView):
+    serializer_class = serializers.MusicListSerializer
+
+    def get_queryset(self):
+        queryset = Music.objects.published().filter(category__id=self.kwargs['pk'])
         return queryset
 
 

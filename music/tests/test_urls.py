@@ -19,4 +19,7 @@ class TestUrls(APITestCase):
     def test_popular_music(self):
         url = reverse('music:popular_music')
         self.assertEqual(resolve(url).func.view_class, views.PopularMusicListView)
-
+    
+    def test_recent_music(self):
+        url = reverse('music:recent_music')
+        self.assertEqual(resolve(url).func.view_class, views.RecentMusicListView)

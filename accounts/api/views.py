@@ -34,8 +34,8 @@ class UserRegisterView(APIView):
             otp_service.generate_otp(clean_data['email'])
             cache.set(key='register', value={'email': clean_data['email'], 'password': clean_data['password'], 'username': clean_data['username']}, timeout=300)
 
-            return Response({'email': clean_data['email'], 'result': 'email sended'}, status=status.HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response({'email': clean_data['email'], 'result': 'email sended', 'success': True}, status=status.HTTP_202_ACCEPTED)
+        return Response({'errors': serializer.errors, 'success': False}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 class GetOTPRegisterCodeView(APIView):

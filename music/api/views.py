@@ -12,7 +12,7 @@ class PopularMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
-        queryset = Music.objects.annotate(num_likes=Count('favorite_musics')).filter(status=True).order_by('-num_likes')[:1]
+        queryset = Music.objects.annotate(num_likes=Count('favorite_musics')).filter(status=True).order_by('-num_likes')[:10]
         return queryset
 
 

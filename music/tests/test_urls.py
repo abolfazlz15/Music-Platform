@@ -23,3 +23,11 @@ class TestUrls(APITestCase):
     def test_recent_music(self):
         url = reverse('music:recent_music')
         self.assertEqual(resolve(url).func.view_class, views.RecentMusicListView)
+
+    def test_music_by_trend_category(self):
+        url = reverse('music:music_by_trend_category')
+        self.assertEqual(resolve(url).func.view_class, views.MusicByTrendCategoryListView)
+
+    def test_slider_home_page(self):
+        url = reverse('music:slider_home_page')
+        self.assertEqual(resolve(url).func.view_class, views.SliderHomePage)        

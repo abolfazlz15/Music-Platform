@@ -4,7 +4,7 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import User, Artist
-from music.models import Category, Music
+from music.models import Category, Music, HomeSlider
 
 
 class CateogryListViewTestCase(APITestCase):
@@ -105,3 +105,49 @@ class RecentMusicListViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertAlmostEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)   
 
+
+class MusicByTrendCategoryListViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        self.artist = Artist.objects.create(name='testArtist')
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+        self.category = Category.objects.create(title='trend')
+        self.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
+        self.music.category.set([self.category])
+        self.music.artist.set([self.artist])
+        self.url = reverse('music:music_by_trend_category')
+
+    def test_get_music_by_trend_category_list_authorized(self):
+        response = self.client.get(self.url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertAlmostEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_music_by_trend_category_list_unauthorized(self):
+        response = self.client.get(self.url)
+        self.assertAlmostEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)   
+
+
+class SliderHomePageTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        self.artist = Artist.objects.create(name='testArtist')
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+        self.slider = HomeSlider.objects.create( url='https://test', status=True)
+        self.url = reverse('music:slider_home_page')
+
+    def test_get_slider_home_page_authorized(self):
+        response = self.client.get(self.url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertAlmostEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_slider_home_page_unauthorized(self):
+        response = self.client.get(self.url)
+        self.assertAlmostEqual(response.status_code, status.HTTP_401_UNAUTHORIZED) 

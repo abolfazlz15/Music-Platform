@@ -39,7 +39,7 @@ class MusicByCategoryListView(generics.ListAPIView):
         context = super().get_serializer_context()
         category_object = ChooseMusicByCategory.objects.last()
         if category_object is None:
-            context['category_name'] = "None"
+            context['category_name'] = 'None'
         else:
             context['category_name'] = category_object.category.title
         return context

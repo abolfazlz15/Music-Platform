@@ -89,8 +89,8 @@ class CategoryDetailView(generics.ListAPIView):
 class InternationalMusicList(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
     queryset = Music.objects.published().filter(type='International')
+
     
-   
 class UserFavoriteMusicView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 

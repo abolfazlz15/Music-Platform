@@ -30,4 +30,10 @@ class TestUrls(APITestCase):
 
     def test_slider_home_page(self):
         url = reverse('music:slider_home_page')
-        self.assertEqual(resolve(url).func.view_class, views.SliderHomePage)        
+        self.assertEqual(resolve(url).func.view_class, views.SliderHomePage)    
+            
+    def search_music(self):
+        url = reverse('music:search_music')
+        self.assertEqual(resolve(url).func.view_class, views.MusicSearchView)    
+        
+            

@@ -1,8 +1,10 @@
 from django.urls import resolve, reverse
 from rest_framework.test import APITestCase
-from music.models import Category, Music
+
 from accounts.models import Artist
 from music.api import views
+from music.models import Category, Music
+
 
 class TestUrls(APITestCase):
     @classmethod
@@ -41,7 +43,11 @@ class TestUrls(APITestCase):
         url = reverse('music:search_music')
         self.assertEqual(resolve(url).func.view_class, views.MusicSearchView)    
         
-    def search_music(self):
+    def music_detail(self):
         url = reverse('music:music_detail', args=(self.music.id,))
         self.assertEqual(resolve(url).func.view_class, views.MusicSearchView)    
+         
+    def international_music(self):
+        url = reverse('music:music_detail')
+        self.assertEqual(resolve(url).func.view_class, views.MusicDetailView)    
          

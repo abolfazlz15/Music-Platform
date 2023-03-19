@@ -153,29 +153,6 @@ class SliderHomePageTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertAlmostEqual(response.status_code, status.HTTP_401_UNAUTHORIZED) 
 
-class MusicByCategoryListViewTestCase(APITestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            email='test@example.com',
-            username='test',
-            password='testpassword',
-        )
-        self.artist = Artist.objects.create(name='testArtist')
-        refresh = RefreshToken.for_user(self.user)
-        self.token = str(refresh.access_token)
-        self.category = Category.objects.create(title='test_category')
-        self.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
-        self.music.category.set([self.category])
-        self.music.artist.set([self.artist])
-        self.url = reverse('music:music_by_category')
-
-    def test_get_music_by_category_list_authorized(self):
-        response = self.client.get(self.url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
-        self.assertAlmostEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_get_music_by_category_list_unauthorized(self):
-        response = self.client.get(self.url)
-        self.assertAlmostEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)       
 
 
 class MusicSearchViewTestCase(APITestCase):
@@ -213,4 +190,27 @@ class MusicSearchViewTestCase(APITestCase):
         self.assertEqual(len(response.data), 0)
 
 
-            
+class MusicDetailViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        self.artist = Artist.objects.create(name='testArtist')
+        self.category = Category.objects.create(title='test_category')
+        self.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
+        self.music.category.set([self.category])
+        self.music.artist.set([self.artist])
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+        self.url = reverse('music:music_detail', args=(self.music.id,))
+
+    def test_get_music_detail_authorized(self):
+        response = self.client.get(self.url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], self.music.title)
+
+    def test_get_music_detail_unauthorized(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

@@ -12,7 +12,7 @@ class PopularMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
-        queryset = Music.objects.annotate(num_likes=Count('favorite_musics')).filter(status=True).order_by('-num_likes')[:1]
+        queryset = Music.objects.annotate(num_likes=Count('favorite_musics')).filter(status=True).order_by('-num_likes')[:10]
         return queryset
 
 
@@ -39,7 +39,7 @@ class MusicByCategoryListView(generics.ListAPIView):
         context = super().get_serializer_context()
         category_object = ChooseMusicByCategory.objects.last()
         if category_object is None:
-            context['category_name'] = "None"
+            context['category_name'] = 'None'
         else:
             context['category_name'] = category_object.category.title
         return context
@@ -89,8 +89,8 @@ class CategoryDetailView(generics.ListAPIView):
 class InternationalMusicList(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
     queryset = Music.objects.published().filter(type='International')
+
     
-   
 class UserFavoriteMusicView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 

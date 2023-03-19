@@ -32,7 +32,7 @@ class Music(models.Model):
         ('International', 'بین المللی'),
         ('Iranian', 'ایرانی'),
     )
-    title = models.CharField(max_length=150)
+    title = models.CharField(max_length=150, verbose_name=_('title'))
     artist = models.ManyToManyField(Artist, related_name='musics', verbose_name=_('artist'))
     url = models.URLField(verbose_name=_('url'))
     cover = models.ImageField(upload_to='image/music_cover', null=True, blank=True, verbose_name=_('music cover'))
@@ -49,7 +49,7 @@ class Music(models.Model):
         verbose_name_plural = 'موزیک ها'
         
     def __str__(self):
-        return f'{self.title} - {self.artist.name}'
+        return self.title
 
     def show_cover(self):
         # show cover in admin panel

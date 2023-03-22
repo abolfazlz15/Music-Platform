@@ -10,7 +10,7 @@ admin.site.register(models.HomeSlider)
 @admin.register(models.Music)
 class MusicAdmin(admin.ModelAdmin):
     # for show customization list objects
-    fields = ('title', 'artist', 'cover', 'category', 'type', 'status', 'url', 'created_at')
+    fields = ('title', 'artist', 'cover', 'text', 'category', 'type', 'status', 'url', 'created_at')
     list_display = ('show_cover', 'title', 'status')
     list_filter = ('status', 'type', 'created_at')
     search_fields = ('title', 'created_at')

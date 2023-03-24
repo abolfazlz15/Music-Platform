@@ -42,6 +42,7 @@ class MusicListSerializer(serializers.ModelSerializer):
 class MusicDetailSerializer(serializers.ModelSerializer):
     artist = serializers.SerializerMethodField()
     category = serializers.SerializerMethodField()
+    cover = serializers.SerializerMethodField()
 
     class Meta:
         model = Music
@@ -54,7 +55,14 @@ class MusicDetailSerializer(serializers.ModelSerializer):
     def get_category(self, obj):
         serializer = CategorySerializer(instance=obj.category.all(), many=True)
         return serializer.data
-
+    
+    def get_cover(self, obj):
+        request = self.context.get('request')
+        # add base URL for cover music
+        if obj.cover:
+            image_url = obj.cover.url
+            return request.build_absolute_uri(image_url)
+        return None
 
 class SliderHomePageSerializer(serializers.ModelSerializer):
     class Meta:

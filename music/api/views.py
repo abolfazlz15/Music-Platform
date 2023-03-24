@@ -67,7 +67,7 @@ class MusicDetailView(generics.GenericAPIView):
     serializer_class = serializers.MusicDetailSerializer
     def get(self, request, pk):
         instance = Music.objects.get(id=pk)
-        serializer = serializers.MusicDetailSerializer(instance=instance)
+        serializer = serializers.MusicDetailSerializer(instance=instance, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

@@ -97,3 +97,46 @@ class UserCreatePlayListViewTestCase(APITestCase):
         }
         response = self.client.post(self.url, data=playlist)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+
+class UserUpdatePlayListViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+        self.music1 = Music.objects.create(title='test_title1', url='https://test1', text='test_text1')
+        self.playlist = Playlist.objects.create(name='test', user=self.user)
+        self.playlist.songs.set([self.music1])
+        self.url = reverse('playlist:update_playlist', args=(self.playlist.id,))
+        
+    def test_update_playlist_authenticated(self):
+        new_data = {
+            'name': 'new name',
+        }
+        response = self.client.put(self.url, data=new_data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.playlist.refresh_from_db()
+        self.assertEqual(self.playlist.name, new_data['name'])
+        
+    def test_update_playlist_unauthorized(self):
+        # Create another user to simulate unauthorized access
+        unauthorized_user = User.objects.create_user(
+            email='unauthorized@example.com',
+            username='unauthorized',
+            password='testpassword',
+        )
+        refresh = RefreshToken.for_user(unauthorized_user)
+        unauthorized_token = str(refresh.access_token)
+        
+        new_data = {
+            'name': 'new name',
+        }
+        response = self.client.put(self.url, data=new_data, HTTP_AUTHORIZATION=f'Bearer {unauthorized_token}')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+

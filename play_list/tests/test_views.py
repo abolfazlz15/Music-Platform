@@ -140,3 +140,26 @@ class UserUpdatePlayListViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
+class UserDeletePlayListViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+        self.music1 = Music.objects.create(title='test_title1', url='https://test1', text='test_text1')
+        self.playlist = Playlist.objects.create(name='test', user=self.user)
+        self.playlist.songs.set([self.music1])
+        self.url = reverse('playlist:delete_playlist', args=(self.playlist.id,))
+        
+    def test_delete_playlist_authenticated(self):
+        response = self.client.delete(self.url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(Playlist.DoesNotExist):
+            self.playlist.refresh_from_db()
+            
+    def test_delete_playlist_unauthorized(self):
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

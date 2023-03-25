@@ -38,3 +38,7 @@ class TestUrls(APITestCase):
     def test_update_playlist(self):
         url = reverse('playlist:update_playlist', args=(self.playlist.id,))
         self.assertEqual(resolve(url).func.view_class, views.UserUpdatePlayListView)
+
+    def test_delete_playlist(self):
+        url = reverse('playlist:delete_playlist', args=(self.playlist.id,))
+        self.assertEqual(resolve(url).func.view_class, views.DeletePlayListView)     

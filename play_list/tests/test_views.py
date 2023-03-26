@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import Artist, User
 from music.models import Category, Music
 from play_list.models import Playlist
-
+from play_list.api.serializers import PlayListSerializer
 
 class UserPlayListViewTestCase(APITestCase):
     def setUp(self):
@@ -163,3 +163,92 @@ class UserDeletePlayListViewTestCase(APITestCase):
     def test_delete_playlist_unauthorized(self):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class PlaylistAddMusicViewTestCase(APITestCase):
+    def setUp(self):
+        self.artist = Artist.objects.create(name='testArtist')
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+        self.playlist = Playlist.objects.create(
+            user=self.user,
+            name='Test Playlist'
+        )
+        self.music = Music.objects.create(title='test_title1', url='https://test1', text='test_text1')
+        self.music.artist.set([self.artist])
+
+        self.url = reverse('playlist:add_music_to_playlist', kwargs={'pk': self.playlist.pk})
+        self.data = {'music_id': self.music.pk}
+
+    def test_add_music_to_playlist(self):
+        response = self.client.put(self.url, data=self.data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('result', response.data)
+        self.assertIn('data', response.data)
+        self.assertEqual(response.data['result'], 'music added')
+        playlist = Playlist.objects.get(pk=self.playlist.pk)
+        self.assertIn(self.music, playlist.songs.all())
+        serializer = PlayListSerializer(playlist)
+        self.assertEqual(response.data['data'], serializer.data)
+
+    def test_add_invalid_music_to_playlist(self):
+        response = self.client.put(self.url, data={'music_id': 999}, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('message', response.data)
+        self.assertEqual(response.data['message'], 'Invalid music ID')
+
+    def test_add_music_to_nonexistent_playlist(self):
+        url = reverse('playlist:add_music_to_playlist', kwargs={'pk': 999})
+        response = self.client.put(url, data=self.data,  HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('message', response.data)
+        self.assertEqual(response.data['message'], 'Invalid playlist ID')
+
+
+class PlaylistRemoveMusicViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        self.playlist = Playlist.objects.create(
+            user=self.user,
+            name='Test Playlist'
+        )
+        self.music = Music.objects.create(title='test_title1', url='https://test1', text='test_text1')
+        self.playlist.songs.add(self.music)
+
+        self.url = reverse('playlist:remove_music_from_playlist', kwargs={'pk': self.playlist.pk})
+        self.data = {'music_id': self.music.pk}
+
+    def test_remove_music_from_playlist(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(self.url, data=self.data)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertIn('result', response.data)
+        self.assertIn('data', response.data)
+        self.assertEqual(response.data['result'], 'music remove')
+        self.assertFalse(self.playlist.songs.filter(id=self.music.id).exists())
+        serializer = PlayListSerializer(instance=self.playlist)
+        self.assertEqual(response.data['data'], serializer.data)
+
+    def test_remove_invalid_music_from_playlist(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(self.url, data={'music_id': 999})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('message', response.data)
+        self.assertEqual(response.data['message'], 'Invalid music ID')
+
+    def test_remove_music_from_nonexistent_playlist(self):
+        url = reverse('playlist:remove_music_from_playlist', kwargs={'pk': 999})
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(url, data=self.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('message', response.data)
+        self.assertEqual(response.data['message'], 'Invalid playlist ID')

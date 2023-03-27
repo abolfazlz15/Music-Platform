@@ -101,6 +101,7 @@ class ArtistSerializer(serializers.ModelSerializer):
     music_quantity = serializers.SerializerMethodField()
     recent_music = serializers.SerializerMethodField()
     popular_music = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Artist
@@ -110,14 +111,24 @@ class ArtistSerializer(serializers.ModelSerializer):
         return artist.musics.count()
 
     def get_recent_music(self, artist):
+        request = self.context.get('request')
         # Get the 3 most recently added music tracks
         musics = artist.musics.order_by('-created_at')[:3]
-        return MusicListSerializer(musics, many=True).data
+        return MusicListSerializer(musics, many=True, context={'request': request}).data
 
     def get_popular_music(self, artist):
+        request = self.context.get('request')
         # Get the 3 most popular music tracks
         musics = artist.musics.annotate(play_count=Count('favorite_musics')).filter(status=True).order_by('-play_count')[:3]
-        return MusicListSerializer(musics, many=True).data
+        return MusicListSerializer(musics, many=True, context={'request': request}).data
+    
+    def get_image(self, obj):
+        request = self.context.get('request')
+        # add base URL for cover music
+        if obj.image:
+            image_url = obj.image.url
+            return request.build_absolute_uri(image_url)
+        return None
 
 
 class ArtistListSerializer(serializers.ModelSerializer):

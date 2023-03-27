@@ -34,10 +34,19 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class MusicListSerializer(serializers.ModelSerializer):
     artist = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
+    cover = serializers.SerializerMethodField()
+    
     class Meta:
         model = Music
         fields = ('id', 'title', 'artist', 'cover')
 
+    def get_cover(self, obj):
+        request = self.context.get('request')
+        # add base URL for cover music
+        if obj.cover:
+            image_url = obj.cover.url
+            return request.build_absolute_uri(image_url)
+        return None
 
 class MusicDetailSerializer(serializers.ModelSerializer):
     artist = serializers.SerializerMethodField()

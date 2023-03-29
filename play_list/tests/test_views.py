@@ -6,11 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import Artist, User
 from music.models import Category, Music
 from play_list.models import Playlist
-<<<<<<< Updated upstream
 from play_list.api.serializers import PlayListSerializer
-=======
-
->>>>>>> Stashed changes
 
 class UserPlayListViewTestCase(APITestCase):
     def setUp(self):
@@ -57,7 +53,6 @@ class UserDetailPlayListViewTestCase(APITestCase):
         self.playlist.songs.set([self.music1, self.music2])
         self.url = reverse('playlist:user_playlist', args=(self.playlist.user.id,))
 
-<<<<<<< Updated upstream
     def test_get_playlist_detail_authorized(self):
         response = self.client.get(self.url,HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -65,17 +60,6 @@ class UserDetailPlayListViewTestCase(APITestCase):
     def test_get_playlist_detail_unauthorized(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-=======
-
-    def test_get_category_detail_authorized(self):
-        response = self.client.get(self.url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_get_category_detail_authorized(self):
-        response = self.client.get(self.url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
->>>>>>> Stashed changes
 
 
 class UserCreatePlayListViewTestCase(APITestCase):
@@ -113,10 +97,6 @@ class UserCreatePlayListViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 class UserUpdatePlayListViewTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(
@@ -129,7 +109,6 @@ class UserUpdatePlayListViewTestCase(APITestCase):
         self.music1 = Music.objects.create(title='test_title1', url='https://test1', text='test_text1')
         self.playlist = Playlist.objects.create(name='test', user=self.user)
         self.playlist.songs.set([self.music1])
-<<<<<<< Updated upstream
         self.url = reverse('playlist:update_playlist', args=(self.playlist.id,))
         
     def test_update_playlist_authenticated(self):
@@ -270,6 +249,3 @@ class PlaylistRemoveMusicViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('message', response.data)
         self.assertEqual(response.data['message'], 'Invalid playlist ID')
-=======
-        self.url = reverse('playlist:update_playlist')
->>>>>>> Stashed changes

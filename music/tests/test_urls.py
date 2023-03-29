@@ -1,19 +1,25 @@
 from django.urls import resolve, reverse
 from rest_framework.test import APITestCase
 
-from accounts.models import Artist
+from accounts.models import Artist, User
 from music.api import views
-from music.models import Category, Music
+from music.models import Category, Music, FavoriteMusic
 
 
 class TestUrls(APITestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
         cls.artist = Artist.objects.create(name='testArtist')
         cls.category = Category.objects.create(title='test_category')
         cls.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
         cls.music.category.set([cls.category])
         cls.music.artist.set([cls.artist])
+        cls.favorite_music = FavoriteMusic.objects.create(music=cls.music, user=cls.user)
 
     def test_category_list(self):
         url = reverse('music:category_list')
@@ -39,15 +45,18 @@ class TestUrls(APITestCase):
         url = reverse('music:slider_home_page')
         self.assertEqual(resolve(url).func.view_class, views.SliderHomePage)    
             
-    def search_music(self):
+    def test_search_music(self):
         url = reverse('music:search_music')
-        self.assertEqual(resolve(url).func.view_class, views.MusicSearchView)    
-        
-    def music_detail(self):
-        url = reverse('music:music_detail', args=(self.music.id,))
-        self.assertEqual(resolve(url).func.view_class, views.MusicSearchView)    
+        self.assertEqual(resolve(url).func.view_class, views.MusicSearchView) 
          
-    def international_music(self):
-        url = reverse('music:music_detail')
-        self.assertEqual(resolve(url).func.view_class, views.MusicDetailView)    
+    def test_international_music(self):
+        url = reverse('music:international_music')
+        self.assertEqual(resolve(url).func.view_class, views.InternationalMusicList)    
          
+    def test_user_favorite_music(self):
+        url = reverse('music:user_favorite_music', args=(self.favorite_music.id,))
+        self.assertEqual(resolve(url).func.view_class, views.UserFavoriteMusicView)   
+
+    def test_user_add_favorite_music(self):
+        url = reverse('music:user_add_favorite_music')
+        self.assertEqual(resolve(url).func.view_class, views.UserAddFavoriteMusicView)       

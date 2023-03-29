@@ -55,7 +55,7 @@ class UserUpdatePlayListView(APIView):
 
 
 class DeletePlayListView(APIView):
-    permission_classes = custom_permissions.IsAuthorOrReadOnly
+    permission_classes = [custom_permissions.IsAuthorOrReadOnly]
 
     def delete(self, request, pk):
         playlist = get_object_or_404(Playlist, id=pk)
@@ -67,7 +67,7 @@ class DeletePlayListView(APIView):
 
 class PlaylistAddMusicView(generics.UpdateAPIView):
     serializer_class = serializers.PlayListSerializer
-    permission_classes = custom_permissions.IsAuthorOrReadOnly
+    permission_classes = [custom_permissions.IsAuthorOrReadOnly]
 
     def put(self, request, pk, *args, **kwargs):
         try:

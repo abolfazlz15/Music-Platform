@@ -55,7 +55,7 @@ class UserDetailPlayListViewTestCase(APITestCase):
 
     def test_get_playlist_detail_authorized(self):
         response = self.client.get(self.url,HTTP_AUTHORIZATION=f'Bearer {self.token}')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_playlist_detail_unauthorized(self):
         response = self.client.get(self.url)

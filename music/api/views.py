@@ -1,7 +1,7 @@
 from django.db.models import Count
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-
+from django.shortcuts import get_object_or_404
 from music.api import serializers
 from music.models import ChooseMusicByCategory, HomeSlider, Music, Category, FavoriteMusic
 
@@ -95,9 +95,22 @@ class UserFavoriteMusicView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        favorite_music_ids = FavoriteMusic.objects.filter(user=user).values_list('music_id', flat=True)
+        favorite_music_ids = FavoriteMusic.objects.filter(user__id=self.kwargs['pk']).values_list('music_id', flat=True)
         return Music.objects.filter(id__in=favorite_music_ids)
+ 
+
+class UserAddFavoriteMusicView(generics.GenericAPIView):
+
+    def post(self, request):
+        music_pk = request.data['pk']
+        music = get_object_or_404(Music, id=music_pk)
+        try:
+            like = FavoriteMusic.objects.get(music_id=request.data['pk'], user_id=request.user.id)
+            like.delete()
+            return Response({'status': False, 'result': 'unlike', 'count': music.favorite_musics.count()}, status=status.HTTP_204_NO_CONTENT)  
+        except:
+            FavoriteMusic.objects.create(user=request.user, music=music)
+            return Response({'status': True, 'result': 'like', 'count': music.favorite_musics.count()}, status=status.HTTP_200_OK)
 
 
 class MusicSearchView(generics.ListAPIView):

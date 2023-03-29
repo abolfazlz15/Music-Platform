@@ -5,7 +5,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from urllib.parse import urlencode
 
 from accounts.models import User, Artist
-from music.models import Category, Music, HomeSlider
+from music.models import Category, Music, HomeSlider, FavoriteMusic
+from music.api.serializers import MusicListSerializer
 
 
 class CateogryListViewTestCase(APITestCase):
@@ -239,3 +240,77 @@ class InternationalMusicListTestCase(APITestCase):
     def test_get_international_music_list_unauthorized(self):
         response = self.client.get(self.url)
         self.assertAlmostEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)   
+
+
+class UserFavoriteMusicViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        self.artist = Artist.objects.create(name='testArtist')
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+        self.category = Category.objects.create(title='test_category')
+        self.music = Music.objects.create(title='test_title', url='https://test', text='test_text', type='International')
+        self.music.category.set([self.category])
+        self.music.artist.set([self.artist])
+
+
+class UserFavoriteMusicViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+        self.user = User.objects.create(username='testuser')
+        self.music1 = Music.objects.create(title='test_title1', url='https://test1', text='test_text1')
+        self.music2 = Music.objects.create(title='test_title2', url='https://test2', text='test_text2')
+        self.favorite1 = FavoriteMusic.objects.create(user=self.user, music=self.music1)
+        self.favorite2 = FavoriteMusic.objects.create(user=self.user, music=self.music2)
+        self.url = reverse('music:user_favorite_music', kwargs={'pk': self.user.pk})
+        
+
+    def test_get_favorite_music_list_authorized(self):
+        response = self.client.get(self.url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        expected_data = MusicListSerializer([self.music1, self.music2], many=True).data
+        self.assertEqual(response.data, expected_data)
+        self.assertAlmostEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_favorite_music_list_unauthorized(self):
+        response = self.client.get(self.url)
+        self.assertAlmostEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+   
+
+class UserAddFavoriteMusicViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        refresh = RefreshToken.for_user(self.user)
+        self.token = str(refresh.access_token)
+        self.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
+        self.url = reverse('music:user_add_favorite_music')
+
+    def test_add_favorite_music_authorized(self):
+        response = self.client.post(self.url, data={'pk': self.music.pk}, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'status': True, 'result': 'like', 'count': 1})
+
+        # Ensure the favorite music object has been created for the user
+        self.assertTrue(FavoriteMusic.objects.filter(user=self.user, music=self.music).exists())
+
+        # Test unliking the music
+        response = self.client.post(self.url, data={'pk': self.music.pk}, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(FavoriteMusic.objects.filter(user=self.user, music=self.music).exists())
+
+    def test_add_favorite_music_unauthorized(self):
+        response = self.client.post(self.url, data={'pk': self.music.pk})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

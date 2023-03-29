@@ -11,7 +11,9 @@ urlpatterns = [
     path('sliderhomepage/', views.SliderHomePage.as_view(), name='slider_home_page'),
 
     path('internationals/', views.InternationalMusicList.as_view(), name='international_music'),
-    path('favoritemusic/', views.UserFavoriteMusicView.as_view(), name='user_favorite_music'),
+
+    path('favoritemusic/<int:pk>', views.UserFavoriteMusicView.as_view(), name='user_favorite_music'),
+    path('favoritemusic/add', views.UserAddFavoriteMusicView.as_view(), name='user_add_favorite_music'),
 
     path('detail/<int:pk>/', views.MusicDetailView.as_view(), name='music_detail'),
 

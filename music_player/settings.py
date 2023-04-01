@@ -24,6 +24,7 @@ LOCAL_APPS = [
     'accounts.apps.AccountsConfig',
     'music.apps.MusicConfig',
     'play_list.apps.PlayListConfig',
+    'pages.apps.PagesConfig',
 
 ]
 

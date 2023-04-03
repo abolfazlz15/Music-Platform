@@ -1,0 +1,10 @@
+from django.urls import path
+
+from pages.api import views
+
+app_name = 'playlist'
+urlpatterns = [
+    path('ticket', views.CreateTicketView.as_view(), name='create_ticket'),
+
+
+]

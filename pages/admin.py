@@ -1,3 +1,6 @@
 from django.contrib import admin
+from pages.models import ContactUsTitle, Ticket
 
-# Register your models here.
+
+admin.site.register(ContactUsTitle)
+admin.site.register(Ticket)

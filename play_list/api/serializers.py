@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
-from accounts.models import Artist, User
+from accounts.models import User
 from music.api.serializers import MusicListSerializer
-from music.models import Music
 from play_list.models import Playlist
 
 

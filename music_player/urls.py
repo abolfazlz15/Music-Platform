@@ -26,9 +26,10 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('playlist/', include('play_list.api.urls')),
     path('accounts/', include('accounts.api.urls')),
     path('music/', include('music.api.urls')),
-    path('playlist/', include('play_list.api.urls')),
+    path('page/', include('pages.api.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [

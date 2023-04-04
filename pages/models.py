@@ -4,7 +4,7 @@ from accounts.models import User
 from utils.date_conversion.utils import jajali_converter
 
 
-class ContactUsTitle(models.Model):
+class TicketTitle(models.Model):
     title = models.CharField(max_length=200)
 
     class Meta:
@@ -16,7 +16,7 @@ class ContactUsTitle(models.Model):
 
 
 class Ticket(models.Model):
-    title = models.ForeignKey(ContactUsTitle, related_name='tickets', null=True, on_delete=models.SET_NULL)
+    title = models.ForeignKey(TicketTitle, related_name='tickets', null=True, on_delete=models.SET_NULL)
     body = models.TextField()
     user = models.ForeignKey(User, related_name='tickets', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

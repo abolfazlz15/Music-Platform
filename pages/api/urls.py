@@ -5,6 +5,7 @@ from pages.api import views
 app_name = 'playlist'
 urlpatterns = [
     path('ticket', views.CreateTicketView.as_view(), name='create_ticket'),
+    path('ticket-title', views.TicketTitleListView.as_view(), name='ticket_title_list'),
 
 
 ]

@@ -1,6 +1,6 @@
 from django.contrib import admin
-from pages.models import ContactUsTitle, Ticket
+from pages.models import TicketTitle, Ticket
 
 
-admin.site.register(ContactUsTitle)
+admin.site.register(TicketTitle)
 admin.site.register(Ticket)

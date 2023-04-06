@@ -1,11 +1,12 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import User
 from utils.date_conversion.utils import jajali_converter
 
 
 class TicketTitle(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, verbose_name=_('title'))
 
     class Meta:
         verbose_name = 'عنوان تیکت'
@@ -16,10 +17,10 @@ class TicketTitle(models.Model):
 
 
 class Ticket(models.Model):
-    title = models.ForeignKey(TicketTitle, related_name='tickets', null=True, on_delete=models.SET_NULL)
-    body = models.TextField()
-    user = models.ForeignKey(User, related_name='tickets', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    title = models.ForeignKey(TicketTitle, related_name='tickets', null=True, on_delete=models.SET_NULL, verbose_name=_('title'))
+    body = models.TextField(verbose_name=_('body'))
+    user = models.ForeignKey(User, related_name='tickets', on_delete=models.CASCADE, verbose_name=_('user'))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('created at'))
 
     class Meta:
         verbose_name = 'تیکت'

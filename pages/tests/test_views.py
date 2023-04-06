@@ -45,7 +45,7 @@ class TicketTitleListViewTestCase(APITestCase):
         self.ticket_title = TicketTitle.objects.create(title='test')
         refresh = RefreshToken.for_user(self.user)
         self.token = str(refresh.access_token)
-        self.url = reverse('page`:ticket_title_list')
+        self.url = reverse('page:ticket_title_list')
         TicketTitle.objects.create(title='test1')
         TicketTitle.objects.create(title='test2')
         TicketTitle.objects.create(title='دیگر')

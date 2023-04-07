@@ -15,7 +15,6 @@ class OTP:
         otp = randint(1000, 9999)
         cache.set(email, (otp, datetime.datetime.now()), self.otp_expiry_minutes * 60)
         self.send_otp(otp, email)
-        print(otp)
 
         return otp
 
@@ -47,5 +46,5 @@ class OTP:
         email = EmailMessage(
             mail_subject, message, to=[to_email]
         )
-        print('test')
+
         email.send()

@@ -1,5 +1,11 @@
+from django.contrib.auth.tokens import default_token_generator
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, permissions, status
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
@@ -8,8 +14,6 @@ from rest_framework.views import APIView
 from accounts.api import serializers
 from accounts.models import Artist, User
 from accounts.otp_service import OTP
-from drf_yasg.utils import swagger_auto_schema
-
 
 
 class UserLoginView(APIView):
@@ -54,7 +58,7 @@ class GetOTPRegisterCodeView(APIView):
             if otp_service.verify_otp(otp=clean_data['code'], email=user_data['email']):
                 user = User.objects.create_user(email=user_data['email'], username=user_data['username'], password=user_data['password'])
                 result = serializer.save(validated_data=user)
-                return Response(result, status=status.HTTP_201_CREATED)
+                return Response({'result': result, 'user_id': user.id}, status=status.HTTP_201_CREATED)
 
             return Response({'error': 'this code not exist or invalid', 'success': False}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -127,3 +131,28 @@ class ArtistListView(generics.ListAPIView):
     queryset = Artist.objects.all()
 
     
+# class ForgotPasswordView(APIView):
+#     serializer_class = ForgotPasswordSerializer
+    
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+        
+#         email = serializer.validated_data['email']
+#         try:
+#             user = User.objects.get(email=email)
+#         except User.DoesNotExist:
+#             return Response({'detail': 'User with this email does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        
+#         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+#         token = default_token_generator.make_token(user)
+#         reset_password_link = f"{request.scheme}://{request.get_host()}/reset-password/{uidb64}/{token}/"
+#         subject = 'Reset your password'
+#         message = render_to_string('email/reset_password.html', {
+#             'reset_password_link': reset_password_link
+#         })
+#         from_email = 'noreply@example.com'
+#         recipient_list = [email]
+#         send_mail(subject, message, from_email, recipient_list)
+        
+#         return Response({'detail': 'We have sent a password reset link to your email address.'}, status=status.HTTP_200_OK)

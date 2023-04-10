@@ -49,6 +49,7 @@ class UserLoginSerializer(serializers.Serializer):
     def save(self, validated_data):
         refresh = RefreshToken.for_user(validated_data)
         return ({
+            'user_id': validated_data.id,
             'success': True,
             'refresh': str(refresh),
             'access': str(refresh.access_token),
@@ -78,6 +79,7 @@ class GetOTPRegisterCodeSerializer(serializers.Serializer):
     def save(self, validated_data):
         refresh = RefreshToken.for_user(validated_data)
         return ({
+            'user_id': validated_data.id,
             'success': True,
             'refresh': str(refresh),
             'access': str(refresh.access_token),

@@ -28,5 +28,9 @@ urlpatterns = [
     path('profile/artist/<int:pk>', views.ArtistProfileView.as_view(), name='profile-artist'),
     path('artists/', views.ArtistListView.as_view(), name='artist-all'),
 
+    # forgot password
+    path('reset', views.ForgotPasswordView.as_view(), name='reset_password'),
+    path('reset/changepassword/<str:encoded_pk>/<str:token>', views.ResetPasswordView.as_view(), name='change_password'),
+    path('reset/done', views.RestPasswordDoneView.as_view(), name='reset_password_done'),
 
 ]

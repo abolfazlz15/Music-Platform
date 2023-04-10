@@ -1,10 +1,13 @@
-from django.contrib.auth.tokens import default_token_generator
+from django.contrib import messages
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.cache import cache
-from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404
+from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views import generic
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, permissions, status
 from rest_framework.generics import UpdateAPIView
@@ -12,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.api import serializers
+from accounts.forms import ForotPasswordForm
 from accounts.models import Artist, User
 from accounts.otp_service import OTP
 
@@ -131,28 +135,72 @@ class ArtistListView(generics.ListAPIView):
     queryset = Artist.objects.all()
 
     
-# class ForgotPasswordView(APIView):
-#     serializer_class = ForgotPasswordSerializer
+class ForgotPasswordView(APIView):
+    serializer_class = serializers.ForgotPasswordSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({'email': 'User does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            encoded_pk = urlsafe_base64_encode(force_bytes(user.pk))
+            token = PasswordResetTokenGenerator().make_token(user)
+            reset_url = reverse(
+                "accounts:change_password",
+                kwargs={"encoded_pk": encoded_pk, "token": token},
+            )
+            reset_link = f'{request.get_host()}/{reset_url}'
+            message = render_to_string('accounts/forgot_password_link.html', {
+                'link': reset_link,
+            })
+            to_email = email
+            email = EmailMessage(
+                'بازیابی ایمیل',
+                message,
+                to=[to_email]
+            )
+            email.send()
+            return Response({'detail': 'Password reset link sent'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResetPasswordView(generic.View): # template base
+    form_class = ForotPasswordForm
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, 'accounts/forgot_password.html', context={'form': form})
     
-#     def post(self, request, *args, **kwargs):
-#         serializer = self.serializer_class(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-        
-#         email = serializer.validated_data['email']
-#         try:
-#             user = User.objects.get(email=email)
-#         except User.DoesNotExist:
-#             return Response({'detail': 'User with this email does not exist.'}, status=status.HTTP_404_NOT_FOUND)
-        
-#         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-#         token = default_token_generator.make_token(user)
-#         reset_password_link = f"{request.scheme}://{request.get_host()}/reset-password/{uidb64}/{token}/"
-#         subject = 'Reset your password'
-#         message = render_to_string('email/reset_password.html', {
-#             'reset_password_link': reset_password_link
-#         })
-#         from_email = 'noreply@example.com'
-#         recipient_list = [email]
-#         send_mail(subject, message, from_email, recipient_list)
-        
-#         return Response({'detail': 'We have sent a password reset link to your email address.'}, status=status.HTTP_200_OK)
+    def post(self, request, *args, **kwargs):
+        try:
+            token = kwargs.get('token')
+            encoded_pk = kwargs.get('encoded_pk')
+
+            pk = urlsafe_base64_decode(encoded_pk).decode()
+            user = User.objects.get(pk=pk)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+            return None
+
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            if PasswordResetTokenGenerator().check_token(user, token):
+                password = data['new_password']
+                confirm_password = data['new_password_confirm']
+                if password != confirm_password:
+                    messages.add_message(request, messages.WARNING, 'رمز عبور شما مطابقت ندارد')
+                user.set_password(password)
+                user.save()
+                return redirect('accounts:reset_password_done')  
+            else:
+                messages.add_message(request, messages.WARNING, 'مشکلی وجود دارد، لطفا دوباره امتحان کنید')
+        return render(request, 'accounts/forgot_password.html', context={'form': form})
+
+
+class RestPasswordDoneView(generic.TemplateView):
+    template_name = 'accounts/reset_password_done.html'

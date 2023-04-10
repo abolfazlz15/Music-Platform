@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, password_validation
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.password_validation import validate_password
 
 from accounts.models import Artist, ImageProfile, User
 from music.api.serializers import MusicListSerializer
@@ -137,3 +138,7 @@ class ArtistListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
         fields = ('id', 'name', 'image')
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()

@@ -1,15 +1,18 @@
 from unittest.mock import MagicMock
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core import mail
+from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.test import TestCase
 
 from accounts.models import Artist
 from accounts.otp_service import OTP
-from django.core import mail
 
 User = get_user_model()
 
@@ -175,3 +178,50 @@ class EmailTest(TestCase):
             fail_silently=False)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Subject here')
+
+
+class ForgotPasswordViewTestCase(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.forgot_password_url = reverse('accounts:reset_password')
+        self.user = get_user_model().objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='testpassword'
+        )
+
+    def test_forgot_password_with_valid_email(self):
+        data = {'email': 'testuser@example.com'}
+        response = self.client.post(self.forgot_password_url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_forgot_password_with_invalid_email(self):
+        data = {'email': 'invalid@example.com'}
+        response = self.client.post(self.forgot_password_url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['email'], 'User does not exist')
+
+        
+class ResetPasswordViewTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword', email='test@example.com')
+        self.uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.token = PasswordResetTokenGenerator().make_token(self.user)
+
+    def test_reset_password_view(self):
+        url = reverse('accounts:change_password', kwargs={'encoded_pk': self.uidb64, 'token': self.token})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts/forgot_password.html')
+        
+        new_password = 'new_test_password'
+        form_data = {
+            'new_password': new_password,
+            'new_password_confirm': new_password,
+        }
+        response = self.client.post(url, form_data)
+        self.assertEqual(response.status_code, 302) # redirected to reset_password_done view
+        
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password(new_password))

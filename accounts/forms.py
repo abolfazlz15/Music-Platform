@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 
 
 from accounts.models import User
@@ -34,7 +35,6 @@ class UserCreationForm(forms.ModelForm):
 
 
 class UserChangeForm(forms.ModelForm):
-    
     password = ReadOnlyPasswordHashField()
 
     class Meta:
@@ -42,3 +42,6 @@ class UserChangeForm(forms.ModelForm):
         fields = ('email', 'password', 'username', 'is_active', 'is_admin', 'is_superuser')
 
 
+class ForotPasswordForm(forms.Form):
+    new_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'رمز عبور'}), validators=[validate_password])
+    new_password_confirm = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'تکرار رمز عبور'}))

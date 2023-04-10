@@ -1,14 +1,13 @@
 from django.contrib import messages
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.cache import cache
 from django.core.mail import EmailMessage
-from django.shortcuts import get_object_or_404, render, redirect
-from django.urls import reverse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views import generic
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, permissions, status
 from rest_framework.generics import UpdateAPIView
@@ -168,8 +167,6 @@ class ForgotPasswordView(APIView):
             email.send()
             return Response({'detail': 'Password reset link sent'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 class ResetPasswordView(generic.View): # template base

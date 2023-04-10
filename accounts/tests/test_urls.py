@@ -1,4 +1,7 @@
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.urls import resolve, reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework.test import APITestCase
 
 from accounts.api import views
@@ -10,7 +13,8 @@ class TestUrls(APITestCase):
     def setUpTestData(cls):
         cls.user = User.objects.create_user(
             email='test@gmail.com', username='test', password='test1234')
-        
+        cls.ncoded_pk = urlsafe_base64_encode(force_bytes(cls.user.pk))
+        cls.token = PasswordResetTokenGenerator().make_token(cls.user)
         cls.artist = Artist.objects.create(name='artistTest')
 
 
@@ -45,3 +49,11 @@ class TestUrls(APITestCase):
     def test_artist_list(self):
         url = reverse('accounts:artist-all')
         self.assertEqual(resolve(url).func.view_class, views.ArtistListView)
+
+    def test_forgot_password(self):
+        url = reverse('accounts:reset_password')
+        self.assertEqual(resolve(url).func.view_class, views.ForgotPasswordView)
+
+    def test_reset_password(self):
+        url = reverse('accounts:change_password', args=(self.ncoded_pk, self.token))
+        self.assertEqual(resolve(url).func.view_class, views.ResetPasswordView)

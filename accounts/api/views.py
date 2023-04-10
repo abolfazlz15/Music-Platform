@@ -58,7 +58,7 @@ class GetOTPRegisterCodeView(APIView):
             if otp_service.verify_otp(otp=clean_data['code'], email=user_data['email']):
                 user = User.objects.create_user(email=user_data['email'], username=user_data['username'], password=user_data['password'])
                 result = serializer.save(validated_data=user)
-                return Response({'result': result, 'user_id': user.id}, status=status.HTTP_201_CREATED)
+                return Response(result, status=status.HTTP_201_CREATED)
 
             return Response({'error': 'this code not exist or invalid', 'success': False}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)

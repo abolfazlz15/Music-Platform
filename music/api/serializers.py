@@ -52,10 +52,11 @@ class MusicDetailSerializer(serializers.ModelSerializer):
     artist = serializers.SerializerMethodField()
     category = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
+    like = serializers.SerializerMethodField()
 
     class Meta:
         model = Music
-        fields = ('id', 'title', 'artist', 'cover', 'text', 'url', 'category')
+        fields = ('id', 'title', 'artist', 'cover', 'text', 'url', 'category', 'like')
 
     def get_artist(self, obj):
         serializer = ArtistSerializer(instance=obj.artist.all(), many=True)
@@ -72,6 +73,10 @@ class MusicDetailSerializer(serializers.ModelSerializer):
             image_url = obj.cover.url
             return request.build_absolute_uri(image_url)
         return None
+    
+    def get_like(self, obj):
+        is_liked = self.context.get('is_liked')
+        return is_liked
 
 class SliderHomePageSerializer(serializers.ModelSerializer):
     class Meta:

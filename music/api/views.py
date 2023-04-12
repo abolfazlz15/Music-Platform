@@ -67,7 +67,11 @@ class MusicDetailView(generics.GenericAPIView):
     serializer_class = serializers.MusicDetailSerializer
     def get(self, request, pk):
         instance = Music.objects.get(id=pk)
-        serializer = serializers.MusicDetailSerializer(instance=instance, context={'request': request})
+        if request.user.favorite_musics.filter(music__id=pk, user=request.user.id).exists():
+            is_liked = True
+        else:
+            is_liked = False
+        serializer = serializers.MusicDetailSerializer(instance=instance, context={'request': request, 'is_liked': is_liked})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

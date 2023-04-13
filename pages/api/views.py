@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from pages.api import serializers
-from pages.models import Ticket, TicketTitle
+from pages.models import Ticket, TicketTitle, AboutUs
 
 
 # Tecket APIs 
@@ -23,4 +23,11 @@ class TicketTitleListView(generics.GenericAPIView):
             serializer = serializers.TicketTitleListSerializer(instance=queryset, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+
+# AboutUs API
+class AboutUsView(generics.GenericAPIView):
+    def get(self, request):
+        queryset = AboutUs.objects.first()
+        serializer = serializers.AboutUsSerializer(instance=queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)

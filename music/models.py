@@ -60,6 +60,16 @@ class Music(models.Model):
 
     show_cover.short_description = 'cover'
 
+    def related_music(self):
+        related_music_qs = Music.objects.filter(category__in=self.category.all()).exclude(id=self.id).order_by('?')[:10]
+        related_music = []
+        ids = []
+        for music in related_music_qs:
+            if music.id not in ids:
+                ids.append(music.id)
+                related_music.append(music)
+        return related_music
+
 
 class FavoriteMusic(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_musics', verbose_name=_('user'))

@@ -137,7 +137,7 @@ class MusicSearchView(generics.GenericAPIView):
 
             # artist
             artist = Artist.objects.filter(name__icontains=search)
-            artist_serializer = ArtistListSerializer(instance=artist, many=True)
+            artist_serializer = ArtistListSerializer(instance=artist, many=True, context={'request': request})
             return Response({'music': music_serializer.data, 'user': user_serializer.data, 'artist': artist_serializer.data})
         else:
             return Response({'result': 'محتوایی وجود ندارد'})  

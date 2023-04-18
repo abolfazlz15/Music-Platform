@@ -135,10 +135,18 @@ class ArtistSerializer(serializers.ModelSerializer):
 
 
 class ArtistListSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
     class Meta:
         model = Artist
         fields = ('id', 'name', 'image')
 
+    def get_image(self, obj):
+        request = self.context.get('request')
+        # add base URL for cover music
+        if obj.image:
+            image_url = obj.image.url
+            return request.build_absolute_uri(image_url)
+        return None
 
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()

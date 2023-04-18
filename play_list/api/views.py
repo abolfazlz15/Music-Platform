@@ -110,5 +110,3 @@ class PlaylistRemoveMusicView(generics.DestroyAPIView):
         serializer = self.get_serializer(playlist)
         return Response({'result': 'music remove', 'data': serializer.data}, status=status.HTTP_204_NO_CONTENT)
 
-
-        

@@ -1,11 +1,14 @@
-from django.db.models import Count
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from music.api import serializers
-from music.models import ChooseMusicByCategory, HomeSlider, Music, Category, FavoriteMusic
 
-from rest_framework.filters import SearchFilter
+from accounts.api.serializers import UserSerializer, ArtistListSerializer
+from accounts.models import Artist, User
+from music.api import serializers
+from music.models import (Category, ChooseMusicByCategory, FavoriteMusic,
+                          HomeSlider, Music)
+
 
 # Home API Views
 class PopularMusicListView(generics.ListAPIView):
@@ -117,8 +120,24 @@ class UserAddFavoriteMusicView(generics.GenericAPIView):
             return Response({'status': True, 'result': 'like', 'count': music.favorite_musics.count()}, status=status.HTTP_200_OK)
 
 
-class MusicSearchView(generics.ListAPIView):
-    queryset = Music.objects.published()
-    serializer_class = serializers.MusicListSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ['title']
+class MusicSearchView(generics.GenericAPIView):
+    def get(self, request):
+        search = request.query_params.get('search', None)
+        if search:
+            # music 
+            music = Music.objects.published().filter(
+                Q(title__icontains=search) |
+                Q(artist__name=search)
+            ).distinct()
+            music_serializer = serializers.MusicListSerializer(instance=music, context={'request': request}, many=True)
+
+            # user
+            user = User.objects.filter(username__icontains=search)
+            user_serializer = UserSerializer(instance=user, many=True)
+
+            # artist
+            artist = Artist.objects.filter(name__icontains=search)
+            artist_serializer = ArtistListSerializer(instance=artist, many=True)
+            return Response({'music': music_serializer.data, 'user': user_serializer.data, 'artist': artist_serializer.data})
+        else:
+            return Response({'result': 'محتوایی وجود ندارد'})  

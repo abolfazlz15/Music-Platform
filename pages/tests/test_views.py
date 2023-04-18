@@ -5,7 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import User
 from pages.api.serializers import TicketSerializer, TicketTitleListSerializer
-from pages.models import Ticket, TicketTitle
+from pages.models import Ticket, TicketTitle, AboutUs
 
 
 class CreateTicketViewTestCase(APITestCase):
@@ -59,3 +59,17 @@ class TicketTitleListViewTestCase(APITestCase):
         all_objects = list(queryset) + [third_object]
         serializer = TicketTitleListSerializer(instance=all_objects, many=True)
         self.assertEqual(response.data, serializer.data)
+
+
+class AboutUsViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            username='test',
+            password='testpassword',
+        )
+        refresh = RefreshToken.for_user(self.user)
+        object = AboutUs.objects.create(version='v1.0.0', description='this is test description')
+        self.token = str(refresh.access_token)
+        self.url = reverse('page:about_us')
+        

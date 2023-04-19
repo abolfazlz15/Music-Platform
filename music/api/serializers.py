@@ -53,10 +53,11 @@ class MusicDetailSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
     like = serializers.SerializerMethodField()
-
+    related_music = serializers.SerializerMethodField()
+    
     class Meta:
         model = Music
-        fields = ('id', 'title', 'artist', 'cover', 'text', 'url', 'category', 'like')
+        fields = ('id', 'title', 'artist', 'cover', 'text', 'url', 'category', 'like', 'related_music')
 
     def get_artist(self, obj):
         serializer = ArtistSerializer(instance=obj.artist.all(), many=True)
@@ -77,6 +78,13 @@ class MusicDetailSerializer(serializers.ModelSerializer):
     def get_like(self, obj):
         is_liked = self.context.get('is_liked')
         return is_liked
+    
+    def get_related_music(self, obj):
+        context = self.context.get('related_music')
+        
+        serializer = MusicListSerializer(instance=context, many=True, context={'request': self.context.get('request')})
+        return serializer.data
+    
 
 class SliderHomePageSerializer(serializers.ModelSerializer):
     class Meta:

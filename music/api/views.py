@@ -35,7 +35,7 @@ class MusicByCategoryListView(generics.ListAPIView):
         if category_object is None:
             return Music.objects.none()
         else:
-            queryset = Music.objects.published().filter(category__id=category_object.category.id)
+            queryset = Music.objects.published().published().filter(category__id=category_object.category.id)
             return queryset
 
     def get_serializer_context(self):
@@ -68,13 +68,16 @@ class SliderHomePage(generics.ListAPIView):
 
 class MusicDetailView(generics.GenericAPIView):
     serializer_class = serializers.MusicDetailSerializer
+
     def get(self, request, pk):
         instance = Music.objects.get(id=pk)
         if request.user.favorite_musics.filter(music__id=pk, user=request.user.id).exists():
             is_liked = True
         else:
             is_liked = False
-        serializer = serializers.MusicDetailSerializer(instance=instance, context={'request': request, 'is_liked': is_liked})
+
+        related_music = instance.related_music()
+        serializer = serializers.MusicDetailSerializer(instance=instance, context={'request': request, 'is_liked': is_liked, 'related_music': related_music})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -114,10 +117,10 @@ class UserAddFavoriteMusicView(generics.GenericAPIView):
         try:
             like = FavoriteMusic.objects.get(music_id=request.data['pk'], user_id=request.user.id)
             like.delete()
-            return Response({'status': False, 'result': 'unlike', 'count': music.favorite_musics.count()}, status=status.HTTP_204_NO_CONTENT)  
+            return Response({'status': False, 'result': 'unlike'}, status=status.HTTP_204_NO_CONTENT)  
         except:
             FavoriteMusic.objects.create(user=request.user, music=music)
-            return Response({'status': True, 'result': 'like', 'count': music.favorite_musics.count()}, status=status.HTTP_200_OK)
+            return Response({'status': True, 'result': 'like'}, status=status.HTTP_200_OK)
 
 
 class MusicSearchView(generics.GenericAPIView):

@@ -86,6 +86,7 @@ class MusicDetailSerializer(serializers.ModelSerializer):
         return serializer.data
     
 
+
 class SliderHomePageSerializer(serializers.ModelSerializer):
     class Meta:
         model = HomeSlider

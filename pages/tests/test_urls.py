@@ -10,3 +10,7 @@ class TestUrls(APITestCase):
     def test_ticket_create(self):
         url = reverse('page:create_ticket')
         self.assertEqual(resolve(url).func.view_class, views.CreateTicketView)
+
+    def test_aboutus_detail(self):
+        url = reverse('page:about_us')
+        self.assertEqual(resolve(url).func.view_class, views.AboutUsView)

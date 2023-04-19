@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from pages.api import serializers
-from pages.models import Ticket, TicketTitle, AboutUs
+from pages.models import AboutUs, Ticket, TicketTitle
 
 
 # Tecket APIs 

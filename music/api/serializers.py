@@ -78,6 +78,7 @@ class MusicDetailSerializer(serializers.ModelSerializer):
         is_liked = self.context.get('is_liked')
         return is_liked
 
+
 class SliderHomePageSerializer(serializers.ModelSerializer):
     class Meta:
         model = HomeSlider

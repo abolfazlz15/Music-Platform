@@ -32,7 +32,8 @@ class PlayListDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'music')
 
     def get_music(self, obj):
-        serializer = MusicListSerializer(instance=obj.songs.all(), many=True)
+        request = self.context.get('request')
+        serializer = MusicListSerializer(instance=obj.songs.all(), many=True, context={'request': request})
         return serializer.data
 
 

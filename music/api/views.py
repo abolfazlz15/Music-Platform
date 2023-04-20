@@ -35,7 +35,7 @@ class MusicByCategoryListView(generics.ListAPIView):
         if category_object is None:
             return Music.objects.none()
         else:
-            queryset = Music.objects.published().published().filter(category__id=category_object.category.id)
+            queryset = Music.objects.published().filter(category__id=category_object.category.id)
             return queryset
 
     def get_serializer_context(self):

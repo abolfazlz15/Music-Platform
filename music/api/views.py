@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.filters import SearchFilter
@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from music.api import serializers
 from music.models import (Category, ChooseMusicByCategory, FavoriteMusic,
                           HomeSlider, Music)
-
+from accounts.api.serializers import ArtistListSerializer, UserSerializer
+from accounts.models import Artist, User
 
 # Home API Views
 class PopularMusicListView(generics.ListAPIView):

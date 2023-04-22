@@ -50,6 +50,7 @@ class UserLoginSerializer(serializers.Serializer):
     def save(self, validated_data):
         refresh = RefreshToken.for_user(validated_data)
         return ({
+            'username': validated_data.username,
             'user_id': validated_data.id,
             'success': True,
             'refresh': str(refresh),

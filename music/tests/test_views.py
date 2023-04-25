@@ -1,12 +1,13 @@
+from urllib.parse import urlencode
+
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
-from urllib.parse import urlencode
 
-from accounts.models import User, Artist
-from music.models import Category, Music, HomeSlider, FavoriteMusic
+from accounts.models import Artist, User
 from music.api.serializers import MusicListSerializer
+from music.models import Category, FavoriteMusic, HomeSlider, Music
 
 
 class CateogryListViewTestCase(APITestCase):
@@ -168,6 +169,7 @@ class MusicSearchViewTestCase(APITestCase):
         self.music1 = Music.objects.create(title='Song 1', cover='song1.jpg')
         self.music2 = Music.objects.create(title='Song 2', cover='song2.jpg')
         self.music3 = Music.objects.create(title='Another Song', cover='another_song.jpg')
+        self.artist = Artist.objects.create(name='Artist 1', image='artist1.jpg')
         self.url = reverse('music:search_music')
     
     def test_music_search(self):
@@ -175,21 +177,48 @@ class MusicSearchViewTestCase(APITestCase):
         url_with_params = f"{self.url}?{urlencode(params)}"
         response = self.client.get(url_with_params, HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
-        self.assertEqual(response.data[0]['title'], 'Song 1')
-        self.assertEqual(response.data[0]['cover'].split('/')[-1], 'song1.jpg')
-        self.assertEqual(response.data[1]['title'], 'Song 2')
-        self.assertEqual(response.data[1]['cover'].split('/')[-1], 'song2.jpg')
-        self.assertEqual(response.data[2]['title'], 'Another Song')
-        self.assertEqual(response.data[2]['cover'].split('/')[-1], 'another_song.jpg')
+
+        # Check the music results
+        self.assertEqual(len(response.data['music']), 3)
+        self.assertEqual(response.data['music'][0]['title'], 'Song 1')
+        self.assertEqual(response.data['music'][0]['cover'].split('/')[-1], 'song1.jpg')
+        self.assertEqual(response.data['music'][1]['title'], 'Song 2')
+        self.assertEqual(response.data['music'][1]['cover'].split('/')[-1], 'song2.jpg')
+        self.assertEqual(response.data['music'][2]['title'], 'Another Song')
+        self.assertEqual(response.data['music'][2]['cover'].split('/')[-1], 'another_song.jpg')
+
+        # Check the user results
+        self.assertEqual(len(response.data['user']), 0)
+
+        # Check the artist results
+        self.assertEqual(len(response.data['artist']), 0)
+        
+    def test_music_search_with_artist(self):
+        params = {'search': 'artist'}
+        url_with_params = f"{self.url}?{urlencode(params)}"
+        response = self.client.get(url_with_params, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check the music results
+        self.assertEqual(len(response.data['music']), 0)
+
+        # Check the user results
+        self.assertEqual(len(response.data['user']), 0)
+
+        # Check the artist results
+        self.assertEqual(len(response.data['artist']), 1)
+        self.assertEqual(response.data['artist'][0]['name'], 'Artist 1')
+        self.assertEqual(response.data['artist'][0]['image'].split('/')[-1], 'artist1.jpg')
         
     def test_music_search_no_results(self):
         params = {'search': 'notfound'}
         url_with_params = f"{self.url}?{urlencode(params)}"
         response = self.client.get(url_with_params, HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 0)
-
+        self.assertEqual(len(response.data['music']), 0)
+        self.assertEqual(len(response.data['user']), 0)
+        self.assertEqual(len(response.data['artist']), 0)
+    
 
 class MusicDetailViewTestCase(APITestCase):
     def setUp(self):
@@ -301,7 +330,7 @@ class UserAddFavoriteMusicViewTestCase(APITestCase):
     def test_add_favorite_music_authorized(self):
         response = self.client.post(self.url, data={'pk': self.music.pk}, HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'status': True, 'result': 'like', 'count': 1})
+        self.assertEqual(response.data, {'status': True, 'result': 'like'})
 
         # Ensure the favorite music object has been created for the user
         self.assertTrue(FavoriteMusic.objects.filter(user=self.user, music=self.music).exists())

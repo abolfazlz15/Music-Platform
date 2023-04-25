@@ -61,6 +61,8 @@ class TicketTitleListViewTestCase(APITestCase):
         self.assertEqual(response.data, serializer.data)
 
 
+
+
 class AboutUsViewTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(
@@ -68,8 +70,16 @@ class AboutUsViewTestCase(APITestCase):
             username='test',
             password='testpassword',
         )
+        self.about_us = AboutUs.objects.create(
+            version='v1.0.0',
+            description='test description'
+        )
         refresh = RefreshToken.for_user(self.user)
-        object = AboutUs.objects.create(version='v1.0.0', description='this is test description')
         self.token = str(refresh.access_token)
-        self.url = reverse('page:about_us')
-        
+
+    def test_get_about_us(self):
+        url = reverse('page:about_us')
+        response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['version'], self.about_us.version)
+        self.assertEqual(response.data['description'], self.about_us.description)

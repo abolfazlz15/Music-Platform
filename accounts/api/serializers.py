@@ -149,5 +149,12 @@ class ArtistListSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(image_url)
         return None
 
+
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
+
+
+class ImageListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageProfile
+        fields = '__all__'

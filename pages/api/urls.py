@@ -7,5 +7,6 @@ urlpatterns = [
     path('ticket', views.CreateTicketView.as_view(), name='create_ticket'),
     path('ticket-title', views.TicketTitleListView.as_view(), name='ticket_title_list'),
 
+    path('aboutus', views.AboutUsView.as_view(), name='about_us'),
 
 ]

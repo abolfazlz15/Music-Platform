@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 
 from accounts.api import serializers
 from accounts.forms import ForotPasswordForm
-from accounts.models import Artist, User
+from accounts.models import Artist, User, ImageProfile
 from accounts.otp_service import OTP
 
 
@@ -77,16 +77,20 @@ class UserProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class ImageProfileListView(generics.ListAPIView):
+    serializer_class = serializers.ImageListSerializer
+    queryset = ImageProfile.objects.all()
+
+
 class UserUpdateProfileView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def put(self, request):
         user = request.user
         serializer = serializers.UserProfileUpdateSerializer(instance=user, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'data': serializer.data, 'success': True}, status=status.HTTP_200_OK)
+        return Response({'errors': serializer.errors, 'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangePasswordView(UpdateAPIView):
@@ -95,7 +99,6 @@ class ChangePasswordView(UpdateAPIView):
         """
         serializer_class = serializers.ChangePasswordSerializer
         model = User
-        permission_classes = [permissions.IsAuthenticated]
 
         def get_object(self, queryset=None):
             obj = self.request.user

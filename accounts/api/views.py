@@ -69,11 +69,10 @@ class GetOTPRegisterCodeView(APIView):
 
 
 class UserProfileView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
         user = get_object_or_404(User, id=pk)
-        serializer = serializers.UserSerializer(instance=user)
+        serializer = serializers.UserSerializer(instance=user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

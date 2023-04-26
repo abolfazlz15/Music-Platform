@@ -57,7 +57,6 @@ class MusicByTrendCategoryListView(generics.ListAPIView):
 
 
 class SliderHomePage(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.SliderHomePageSerializer
 
     def get_queryset(self):

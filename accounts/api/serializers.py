@@ -12,20 +12,28 @@ class ImageProfileSerializer(serializers.ModelSerializer):
         model = ImageProfile
         fields = ('image',)
 
-    def get_image(self, obj):
-        request = self.context.get('request')
-        # add base URL for cover music
-        if obj.image:
-            image_url = obj.image.url
-            return request.build_absolute_uri(image_url)
-        return None
+    # def get_image(self, obj):
+    #     request = self.context.get('request')
+    #     # add base URL for cover music
+    #     if obj.image:
+    #         image_url = obj.image.url
+    #         return request.build_absolute_uri(image_url)
+    #     return None
     
 class UserSerializer(serializers.ModelSerializer):
-    profile_image = ImageProfileSerializer(many=False, read_only=True)
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.profile_image:
+            image_url = obj.profile_image.image.url
+            return request.build_absolute_uri(image_url)
+        return None
+
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'profile_image')
+        fields = ('id', 'email', 'username', 'image')
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):

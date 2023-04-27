@@ -135,7 +135,7 @@ class MusicSearchView(generics.GenericAPIView):
 
             # user
             user = User.objects.filter(username__icontains=search)
-            user_serializer = UserSerializer(instance=user, many=True)
+            user_serializer = UserSerializer(instance=user, many=True, context={'request': request})
 
             # artist
             artist = Artist.objects.filter(name__icontains=search)

@@ -60,9 +60,8 @@ class DeletePlayListView(APIView):
     def delete(self, request, pk):
         playlist = get_object_or_404(Playlist, id=pk)
         self.check_object_permissions(request, playlist)
-
         playlist.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'success': True}, status=status.HTTP_204_NO_CONTENT)
 
 
 class PlaylistAddMusicView(generics.UpdateAPIView):
@@ -98,16 +97,16 @@ class PlaylistRemoveMusicView(generics.DestroyAPIView):
             playlist = Playlist.objects.get(user=request.user, id=pk)
             
         except Playlist.DoesNotExist:
-            return Response({'message': 'Invalid playlist ID'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Invalid playlist ID', 'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
         music_id = request.data.get('music_id')
         self.check_object_permissions(self.request, playlist)
         try:
             music = playlist.songs.get(id=music_id)
         except Music.DoesNotExist:
-            return Response({'message': 'Invalid music ID'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Invalid music ID', 'success': False}, status=status.HTTP_400_BAD_REQUEST)
         playlist.songs.remove(music)
 
         serializer = self.get_serializer(playlist)
-        return Response({'result': 'music remove', 'data': serializer.data}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'result': 'music remove', 'data': serializer.data, 'success': True}, status=status.HTTP_204_NO_CONTENT)
 

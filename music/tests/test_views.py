@@ -44,7 +44,7 @@ class CateogryDetailViewTestCase(APITestCase):
         self.token = str(refresh.access_token)
         self.category = Category.objects.create(title='test_category')
         self.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
-        self.music.category.set([self.category])
+        self.music.category = self.category
         self.music.artist.set([self.artist])
 
         self.url = reverse('music:category_detail', args=(self.category.id,))
@@ -121,7 +121,7 @@ class MusicByTrendCategoryListViewTestCase(APITestCase):
         self.token = str(refresh.access_token)
         self.category = Category.objects.create(title='trend')
         self.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
-        self.music.category.set([self.category])
+        self.music.category = self.category
         self.music.artist.set([self.artist])
         self.url = reverse('music:music_by_trend_category')
 
@@ -230,7 +230,7 @@ class MusicDetailViewTestCase(APITestCase):
         self.artist = Artist.objects.create(name='testArtist')
         self.category = Category.objects.create(title='test_category')
         self.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
-        self.music.category.set([self.category])
+        self.music.category = self.category
         self.music.artist.set([self.artist])
         refresh = RefreshToken.for_user(self.user)
         self.token = str(refresh.access_token)
@@ -258,7 +258,7 @@ class InternationalMusicListTestCase(APITestCase):
         self.token = str(refresh.access_token)
         self.category = Category.objects.create(title='test_category')
         self.music = Music.objects.create(title='test_title', url='https://test', text='test_text', type='International')
-        self.music.category.set([self.category])
+        self.music.category = self.category
         self.music.artist.set([self.artist])
         self.url = reverse('music:international_music')
 

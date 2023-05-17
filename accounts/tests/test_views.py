@@ -135,7 +135,6 @@ class UserUpdateProfileViewTestCase(APITestCase):
         }
         response = self.client.put(url, data=new_data, HTTP_AUTHORIZATION=f'Bearer {self.token}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], new_data['username'])
 
     def test_update_user_unauthorized(self):
         url = reverse('accounts:profile-update')

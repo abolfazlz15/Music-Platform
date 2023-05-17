@@ -64,7 +64,7 @@ class MusicDetailSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_category(self, obj):
-        serializer = CategorySerializer(instance=obj.category.all(), many=True)
+        serializer = CategorySerializer(instance=obj.category)
         return serializer.data
     
     def get_cover(self, obj):

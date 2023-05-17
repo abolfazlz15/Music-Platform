@@ -75,6 +75,7 @@ class MusicDetailView(generics.GenericAPIView):
         else:
             is_liked = False
 
+
         related_music = instance.related_music()
         serializer = serializers.MusicDetailSerializer(instance=instance, context={'request': request, 'is_liked': is_liked, 'related_music': related_music})
         return Response(serializer.data, status=status.HTTP_200_OK)

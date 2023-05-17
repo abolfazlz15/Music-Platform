@@ -71,7 +71,7 @@ class PopularMusicListViewTestCase(APITestCase):
         self.token = str(refresh.access_token)
         self.category = Category.objects.create(title='test_category')
         self.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
-        self.music.category.set([self.category])
+        self.music.category = self.category
         self.music.artist.set([self.artist])
         self.url = reverse('music:popular_music')
 
@@ -96,7 +96,7 @@ class RecentMusicListViewTestCase(APITestCase):
         self.token = str(refresh.access_token)
         self.category = Category.objects.create(title='test_category')
         self.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
-        self.music.category.set([self.category])
+        self.music.category = self.category
         self.music.artist.set([self.artist])
         self.url = reverse('music:recent_music')
 

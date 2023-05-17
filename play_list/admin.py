@@ -7,5 +7,4 @@ class PlaylistAdmin(admin.ModelAdmin):
     fields = ('name', 'user', 'songs')
     list_display = ('name', 'user')
     search_fields = ('user', 'name')
-
     list_display = ('name', 'user')

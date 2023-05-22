@@ -61,7 +61,7 @@ class DeletePlayListView(APIView):
         playlist = get_object_or_404(Playlist, id=pk)
         self.check_object_permissions(request, playlist)
         playlist.delete()
-        return Response({'success': True}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'success': True, 'message': 'playlist deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class PlaylistAddMusicView(generics.UpdateAPIView):

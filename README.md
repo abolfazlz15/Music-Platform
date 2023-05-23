@@ -14,7 +14,7 @@ A web application powered by Django framework and DRF
 git clone https://github.com/abolfazlz15/Music-Platform.git
 ```
 
-- `cd /wall` Where the manage.py is
+- `cd /Music-Platform` Where the manage.py is
 - In terminal: `python -m venv venv`
 - Activate your venv: in windows `cd venv\scripts\activate` in linux: `venv/bin/activate`
 - And then back to the main directory `cd ..\..`

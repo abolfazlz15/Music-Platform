@@ -5,7 +5,7 @@ A web application powered by Django framework and DRF
 - Write testing for APIs, models, URLs
 - Authentication (JWT and OTP code)
 - Documented by Swagger
-- Use reids for caching (coming soon)
+- Use redis for caching (coming soon)
 - Dockerized (coming soon)
 - Useing the nginx (coming soon)
 

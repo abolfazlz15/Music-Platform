@@ -128,8 +128,8 @@ class MusicSearchView(generics.GenericAPIView):
             # music 
             music = Music.objects.published().filter(
                 Q(title__icontains=search) |
-                Q(artist__name=search)
-            ).distinct()
+                Q(artist__name__icontains=search)
+            )
             music_serializer = serializers.MusicListSerializer(instance=music, context={'request': request}, many=True)
 
             # user

@@ -17,7 +17,7 @@ class TestUrls(APITestCase):
         cls.artist = Artist.objects.create(name='testArtist')
         cls.category = Category.objects.create(title='test_category')
         cls.music = Music.objects.create(title='test_title', url='https://test', text='test_text')
-        cls.music.category.set([cls.category])
+        cls.music.category = cls.category
         cls.music.artist.set([cls.artist])
         cls.favorite_music = FavoriteMusic.objects.create(music=cls.music, user=cls.user)
 

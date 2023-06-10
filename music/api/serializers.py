@@ -48,6 +48,7 @@ class MusicListSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(image_url)
         return None
 
+
 class MusicDetailSerializer(serializers.ModelSerializer):
     artist = serializers.SerializerMethodField()
     category = serializers.SerializerMethodField()
@@ -64,7 +65,7 @@ class MusicDetailSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_category(self, obj):
-        serializer = CategorySerializer(instance=obj.category.all(), many=True)
+        serializer = CategorySerializer(instance=obj.category)
         return serializer.data
     
     def get_cover(self, obj):
@@ -85,6 +86,13 @@ class MusicDetailSerializer(serializers.ModelSerializer):
         serializer = MusicListSerializer(instance=context, many=True, context={'request': self.context.get('request')})
         return serializer.data
     
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        skip_music = self.context.get('skip_music')
+        representation['skip_music'] = skip_music
+
+        return representation
 
 
 class SliderHomePageSerializer(serializers.ModelSerializer):

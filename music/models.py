@@ -37,7 +37,7 @@ class Music(models.Model):
     url = models.URLField(verbose_name=_('url'))
     cover = models.ImageField(upload_to='image/music_cover', null=True, blank=True, verbose_name=_('music cover'))
     text = RichTextField(verbose_name=_('text'), null=True, blank=True)
-    category = models.ManyToManyField(Category, related_name='musics', verbose_name=_('category'))
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, related_name='musics', verbose_name=_('category'))
     type = models.CharField(choices=MUSIC_TYPE, null=True, blank=True, default='Iranian', max_length=30, verbose_name=_('type'))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -61,7 +61,7 @@ class Music(models.Model):
     show_cover.short_description = 'cover'
 
     def related_music(self):
-        related_music_qs = Music.objects.filter(category__in=self.category.all()).exclude(id=self.id).order_by('?')[:10]
+        related_music_qs = Music.objects.filter(category=self.category).exclude(id=self.id).order_by('?')[:10]
         related_music = []
         ids = []
         for music in related_music_qs:
@@ -78,14 +78,13 @@ class FavoriteMusic(models.Model):
     class Meta:
         verbose_name = 'موزیک لایک شده کاربر'
         verbose_name_plural = 'موزیک های لایک شده کاربر'
-
     def __str__(self):
         return f'{self.music.title} - {self.user.username}'
 
 
+    
 class ChooseMusicByCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
-    
     class Meta:
         verbose_name = 'نمایش موزیک بر اساس دسته بندی در صفحه خانه'
         verbose_name_plural = 'نمایش موزیک بر اساس دسته بندی در صفحه خانه'
@@ -98,6 +97,7 @@ class HomeSlider(models.Model):
     url = models.URLField(null=True, blank=True)
     status = models.BooleanField(default=True)
     
+ 
     class Meta:
         verbose_name = 'اسلایدر صفحه خانه'
         verbose_name_plural = 'اسلایدر های صفحه خانه'

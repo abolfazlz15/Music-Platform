@@ -1,7 +1,6 @@
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, permissions, status
-from rest_framework.filters import SearchFilter
+from rest_framework import generics, status
 from rest_framework.response import Response
 
 from music.api import serializers
@@ -9,6 +8,7 @@ from music.models import (Category, ChooseMusicByCategory, FavoriteMusic,
                           HomeSlider, Music)
 from accounts.api.serializers import ArtistListSerializer, UserSerializer
 from accounts.models import Artist, User
+
 
 # Home API Views
 class PopularMusicListView(generics.ListAPIView):
@@ -75,9 +75,15 @@ class MusicDetailView(generics.GenericAPIView):
         else:
             is_liked = False
 
+        next_music_id = Music.objects.filter(id__gt=pk, category=instance.category.id).order_by('id').values_list('id', flat=True).first()
+        previous_music_id = Music.objects.filter(id__lt=pk, category=instance.category.id).values_list('id', flat=True).order_by('id').last()
+        skip_music = {
+            'next_music_id': next_music_id,
+            'previous_music_id': previous_music_id,
+            }
 
         related_music = instance.related_music()
-        serializer = serializers.MusicDetailSerializer(instance=instance, context={'request': request, 'is_liked': is_liked, 'related_music': related_music})
+        serializer = serializers.MusicDetailSerializer(instance=instance, context={'request': request, 'is_liked': is_liked, 'related_music': related_music, 'skip_music': skip_music})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -87,6 +93,7 @@ class CateogryListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = Category.objects.all()
         return queryset
+
 
 class CategoryDetailView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer

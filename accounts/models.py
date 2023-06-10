@@ -1,9 +1,9 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
 from accounts.managers import UserManager
 from utils.date_conversion.utils import jajali_converter
+
 
 class ImageProfile(models.Model):
     title = models.CharField(max_length=100, verbose_name=_('title'))

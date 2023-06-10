@@ -37,7 +37,7 @@ class Music(models.Model):
     url = models.URLField(verbose_name=_('url'))
     cover = models.ImageField(upload_to='image/music_cover', null=True, blank=True, verbose_name=_('music cover'))
     text = RichTextField(verbose_name=_('text'), null=True, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, related_name='musics', verbose_name=_('category'))
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='musics', verbose_name=_('category'))
     type = models.CharField(choices=MUSIC_TYPE, null=True, blank=True, default='Iranian', max_length=30, verbose_name=_('type'))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

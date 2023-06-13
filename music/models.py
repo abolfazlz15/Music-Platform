@@ -27,6 +27,7 @@ class Category(models.Model):
 
     show_cover.short_description = 'cover'
 
+
 class Music(models.Model):
     MUSIC_TYPE = (
         ('International', 'بین المللی'),
@@ -82,7 +83,6 @@ class FavoriteMusic(models.Model):
         return f'{self.music.title} - {self.user.username}'
 
 
-    
 class ChooseMusicByCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     class Meta:

@@ -3,11 +3,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
 
+from accounts.api.serializers import ArtistListSerializer, UserSerializer
+from accounts.models import Artist, User
 from music.api import serializers
 from music.models import (Category, ChooseMusicByCategory, FavoriteMusic,
                           HomeSlider, Music)
-from accounts.api.serializers import ArtistListSerializer, UserSerializer
-from accounts.models import Artist, User
 
 
 # Home API Views
@@ -76,7 +76,7 @@ class MusicDetailView(generics.GenericAPIView):
             is_liked = False
 
         next_music_id = Music.objects.filter(id__gt=pk, category=instance.category.id).order_by('id').values_list('id', flat=True).first()
-        previous_music_id = Music.objects.filter(id__lt=pk, category=instance.category.id).values_list('id', flat=True).order_by('id').last()
+        previous_music_id = Music.objects.filter(id__lt=pk, category=instance.category.id).order_by('id').values_list('id', flat=True).last()
         skip_music = {
             'next_music_id': next_music_id,
             'previous_music_id': previous_music_id,
@@ -150,4 +150,4 @@ class MusicSearchView(generics.GenericAPIView):
             artist_serializer = ArtistListSerializer(instance=artist, many=True, context={'request': request})
             return Response({'music': music_serializer.data, 'user': user_serializer.data, 'artist': artist_serializer.data})
         else:
-            return Response({'result': 'محتوایی وجود ندارد'})  
+            return Response({'result': 'there is no content'})  

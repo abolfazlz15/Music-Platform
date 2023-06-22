@@ -14,11 +14,10 @@ class MusicByCategorySerializer(serializers.ModelSerializer):
     category_name = serializers.StringRelatedField(source='category')
     artist = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
 
-    
     class Meta:
         model = Music
         fields = ('id', 'title', 'artist', 'cover', 'category_name')
-        
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         category_name = self.context.get('category_name')
@@ -35,7 +34,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class MusicListSerializer(serializers.ModelSerializer):
     artist = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
     cover = serializers.SerializerMethodField()
-    title = serializers.CharField()
+
     class Meta:
         model = Music
         fields = ('id', 'title', 'artist', 'cover')
@@ -50,24 +49,20 @@ class MusicListSerializer(serializers.ModelSerializer):
 
 
 class MusicDetailSerializer(serializers.ModelSerializer):
-    artist = serializers.SerializerMethodField()
+    artist = ArtistSerializer(many=True)
     category = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
     like = serializers.SerializerMethodField()
     related_music = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Music
         fields = ('id', 'title', 'artist', 'cover', 'text', 'url', 'category', 'like', 'related_music')
 
-    def get_artist(self, obj):
-        serializer = ArtistSerializer(instance=obj.artist.all(), many=True)
-        return serializer.data
-
     def get_category(self, obj):
         serializer = CategorySerializer(instance=obj.category)
         return serializer.data
-    
+
     def get_cover(self, obj):
         request = self.context.get('request')
         # add base URL for cover music
@@ -75,20 +70,20 @@ class MusicDetailSerializer(serializers.ModelSerializer):
             image_url = obj.cover.url
             return request.build_absolute_uri(image_url)
         return None
-    
+
     def get_like(self, obj):
         is_liked = self.context.get('is_liked')
         return is_liked
-    
+
     def get_related_music(self, obj):
         context = self.context.get('related_music')
-        
+
         serializer = MusicListSerializer(instance=context, many=True, context={'request': self.context.get('request')})
         return serializer.data
-    
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        
+
         skip_music = self.context.get('skip_music')
         representation['skip_music'] = skip_music
 

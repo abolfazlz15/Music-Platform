@@ -13,14 +13,14 @@ class UserPlayListView(APIView):
     serializer_class = serializers.PlayListSerializer
 
     def get(self, request, pk):
-        queryset = Playlist.objects.filter(user__id=pk)
+        queryset = Playlist.objects.select_related('user').filter(user__id=pk)
         serializer = self.serializer_class(instance=queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserDetailPlayListView(APIView):
     serializer_class = serializers.PlayListDetailSerializer
-    
+
     def get(self, request, pk):
         queryset = Playlist.objects.get(id=pk)
         serializer = self.serializer_class(instance=queryset, context={'request': request})
@@ -29,7 +29,7 @@ class UserDetailPlayListView(APIView):
 
 class UserCreatePlayListView(APIView):
     serializer_class = serializers.PlayListCreateSerializer
-    
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
@@ -38,12 +38,12 @@ class UserCreatePlayListView(APIView):
             serializer.save()
             return Response({'result': 'playlist created', 'success': True}, status=status.HTTP_201_CREATED)
         return Response({'result': serializer.errors, 'success': True}, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class UserUpdatePlayListView(APIView):
     serializer_class = serializers.PlayListCreateSerializer
     permission_classes = [custom_permissions.IsAuthorOrReadOnly]
-    
+
     def put(self, request, pk):
         instance = Playlist.objects.get(id=pk)
         self.check_object_permissions(request, instance)
@@ -86,7 +86,7 @@ class PlaylistAddMusicView(generics.UpdateAPIView):
 
         serializer = self.get_serializer(playlist)
         return Response({'result': 'music added', 'data': serializer.data, 'success': True}, status=status.HTTP_200_OK)
-    
+
 
 class PlaylistRemoveMusicView(generics.DestroyAPIView):
     serializer_class = serializers.PlayListSerializer
@@ -95,7 +95,7 @@ class PlaylistRemoveMusicView(generics.DestroyAPIView):
     def delete(self, request, pk):
         try:
             playlist = Playlist.objects.get(user=request.user, id=pk)
-            
+
         except Playlist.DoesNotExist:
             return Response({'message': 'Invalid playlist ID', 'success': False}, status=status.HTTP_400_BAD_REQUEST)
 

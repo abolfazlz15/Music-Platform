@@ -39,7 +39,7 @@ class PlayListDetailSerializer(serializers.ModelSerializer):
 
 class PlayListCreateSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
+
     class Meta:
         model = Playlist
         fields = ('name', 'user')
-

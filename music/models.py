@@ -62,7 +62,7 @@ class Music(models.Model):
     show_cover.short_description = 'cover'
 
     def related_music(self):
-        related_music_qs = Music.objects.filter(category=self.category).exclude(id=self.id).order_by('?')[:10]
+        related_music_qs = Music.objects.select_related('category').prefetch_related('artist').filter(category=self.category).exclude(id=self.id).order_by('?')[:10]
         related_music = []
         ids = []
         for music in related_music_qs:

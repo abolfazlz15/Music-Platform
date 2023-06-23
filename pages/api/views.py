@@ -5,11 +5,11 @@ from pages.api import serializers
 from pages.models import AboutUs, Ticket, TicketTitle
 
 
-# Tecket APIs 
+# Ticket APIs
 class CreateTicketView(generics.CreateAPIView):
     queryset = Ticket
     serializer_class = serializers.TicketSerializer
-    
+
 
 class TicketTitleListView(generics.GenericAPIView):
     def get(self, request):

@@ -2,7 +2,7 @@ from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
-
+from django.db.models import Max, Min
 from accounts.api.serializers import ArtistListSerializer, UserSerializer
 from accounts.models import Artist, User
 from music.api import serializers
@@ -15,11 +15,12 @@ class PopularMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
-        queryset = Music.objects.annotate(num_likes=Count('favorite_musics')).filter(status=True).order_by('-num_likes')[:10]
+        queryset = Music.objects.annotate(num_likes=Count('favorite_musics')).filter(status=True).order_by(
+            '-num_likes')[:10]
         return queryset
 
 
-class RecentMusicListView(generics.ListAPIView):  
+class RecentMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
@@ -62,29 +63,29 @@ class SliderHomePage(generics.ListAPIView):
     def get_queryset(self):
         queryset = HomeSlider.objects.filter(status=True)
         return queryset
+
+
 # End Home API Views
-
-
 class MusicDetailView(generics.GenericAPIView):
     serializer_class = serializers.MusicDetailSerializer
 
     def get(self, request, pk):
-        instance = Music.objects.get(id=pk)
-        if request.user.favorite_musics.filter(music__id=pk, user=request.user.id).exists():
-            is_liked = True
-        else:
-            is_liked = False
-
-        next_music_id = Music.objects.filter(id__gt=pk, category=instance.category.id).order_by('id').values_list('id', flat=True).first()
-        previous_music_id = Music.objects.filter(id__lt=pk, category=instance.category.id).order_by('id').values_list('id', flat=True).last()
-        skip_music = {
-            'next_music_id': next_music_id,
-            'previous_music_id': previous_music_id,
-            }
-
+        instance = Music.objects.select_related('category').prefetch_related('artist').get(id=pk)
+        is_liked = instance.favorite_musics.filter(user=request.user).exists()
+        next_music_id = self.get_next_music_id(instance)
+        previous_music_id = self.get_previous_music_id(instance)
         related_music = instance.related_music()
-        serializer = serializers.MusicDetailSerializer(instance=instance, context={'request': request, 'is_liked': is_liked, 'related_music': related_music, 'skip_music': skip_music})
+        serializer = self.get_serializer(instance, context={'request': request, 'is_liked': is_liked,
+                                                            'related_music': related_music,
+                                                            'skip_music': {'next_music_id': next_music_id,
+                                                                           'previous_music_id': previous_music_id}})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_next_music_id(self, instance):
+        return Music.objects.filter(id__gt=instance.id, category=instance.category).aggregate(Min('id')).get('id__min')
+
+    def get_previous_music_id(self, instance):
+        return Music.objects.filter(id__lt=instance.id, category=instance.category).aggregate(Max('id')).get('id__max')
 
 
 class CateogryListView(generics.ListAPIView):
@@ -107,14 +108,14 @@ class InternationalMusicList(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
     queryset = Music.objects.published().filter(type='International')
 
-    
+
 class UserFavoriteMusicView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
         favorite_music_ids = FavoriteMusic.objects.filter(user__id=self.kwargs['pk']).values_list('music_id', flat=True)
         return Music.objects.filter(id__in=favorite_music_ids)
- 
+
 
 class UserAddFavoriteMusicView(generics.GenericAPIView):
 
@@ -124,7 +125,7 @@ class UserAddFavoriteMusicView(generics.GenericAPIView):
         try:
             like = FavoriteMusic.objects.get(music_id=request.data['pk'], user_id=request.user.id)
             like.delete()
-            return Response({'status': False, 'result': 'unlike'}, status=status.HTTP_204_NO_CONTENT)  
+            return Response({'status': False, 'result': 'unlike'}, status=status.HTTP_204_NO_CONTENT)
         except:
             FavoriteMusic.objects.create(user=request.user, music=music)
             return Response({'status': True, 'result': 'like'}, status=status.HTTP_200_OK)
@@ -148,6 +149,7 @@ class MusicSearchView(generics.GenericAPIView):
             # artist
             artist = Artist.objects.filter(name__icontains=search)
             artist_serializer = ArtistListSerializer(instance=artist, many=True, context={'request': request})
-            return Response({'music': music_serializer.data, 'user': user_serializer.data, 'artist': artist_serializer.data})
+            return Response(
+                {'music': music_serializer.data, 'user': user_serializer.data, 'artist': artist_serializer.data})
         else:
-            return Response({'result': 'there is no content'})  
+            return Response({'result': 'there is no content'})

@@ -79,9 +79,7 @@ class MusicDetailView(generics.GenericAPIView):
                                                             'related_music': related_music,
                                                             'skip_music': {'next_music_id': next_music_id,
                                                                            'previous_music_id': previous_music_id}})
-        data = serializer.data
-
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_next_music_id(self, instance):
         return Music.objects.filter(id__gt=instance.id, category=instance.category).aggregate(Min('id')).get('id__min')

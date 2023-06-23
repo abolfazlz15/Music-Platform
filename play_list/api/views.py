@@ -22,7 +22,7 @@ class UserDetailPlayListView(APIView):
     serializer_class = serializers.PlayListDetailSerializer
 
     def get(self, request, pk):
-        queryset = Playlist.objects.get(id=pk)
+        queryset = Playlist.objects.prefetch_related('songs__artist').get(id=pk)
         serializer = self.serializer_class(instance=queryset, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -108,5 +108,5 @@ class PlaylistRemoveMusicView(generics.DestroyAPIView):
         playlist.songs.remove(music)
 
         serializer = self.get_serializer(playlist)
-        return Response({'result': 'music remove', 'data': serializer.data, 'success': True}, status=status.HTTP_204_NO_CONTENT)
-
+        return Response({'result': 'music remove', 'data': serializer.data, 'success': True},
+                        status=status.HTTP_204_NO_CONTENT)

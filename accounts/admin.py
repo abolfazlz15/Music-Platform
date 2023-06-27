@@ -21,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
 
     def has_delete_permission(self, request, obj=None):
         if obj is not None and request.user.is_superuser == False:
-            if obj is not None and request.user.is_admin and obj.is_admin:
+            if request.user.is_admin and obj.is_admin:
                 return False
             else:
                 return True
@@ -30,7 +30,9 @@ class UserAdmin(BaseUserAdmin):
 
     def has_change_permission(self, request, obj=None):
         if obj is not None and request.user.is_superuser == False:
-            if obj is not None and request.user.is_admin and obj.is_admin:
+            if request.user.is_admin and request.user.email == obj.email:
+                return True
+            elif request.user.is_admin and obj.is_admin:
                 return False
             else:
                 return True

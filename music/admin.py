@@ -11,14 +11,16 @@ admin.site.register(models.HomeSlider)
 class MusicAdmin(admin.ModelAdmin):
     # for show customization list objects
     fields = ('title', 'artist', 'cover', 'text', 'category', 'type', 'status', 'url', 'created_at')
-    list_display = ('show_cover', 'title', 'get_artist', 'status')
+    list_display = ('show_cover', 'title', 'get_artist', 'status', 'category')
     list_filter = ('status', 'type', 'created_at')
-    search_fields = ('title', 'created_at')
+    search_fields = ('title', 'created_at', 'artist__name')
     ordering = ('status',)
     readonly_fields = ('created_at',)
-
+    autocomplete_fields = ['category']
     list_display_links = ('title', 'show_cover',)
     actions = ['make_published', 'make_depublish']
+    list_select_related = ['category']
+    filter_horizontal = ['artist']
 
     def get_artist(self, obj):
         return "\n ,".join([p.name for p in obj.artist.all()])

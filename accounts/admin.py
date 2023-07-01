@@ -70,6 +70,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email', 'username')
     ordering = ('email',)
     filter_horizontal = ()
+    list_select_related = ['profile_image']
 
 
 admin.site.register(User, UserAdmin)

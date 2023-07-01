@@ -11,3 +11,4 @@ class TicketAdmin(admin.ModelAdmin):
     list_filter = ['created_at']
     search_fields = ['title', 'user']
     list_select_related = ['title', 'user']
+    list_per_page = 50

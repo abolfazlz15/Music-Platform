@@ -71,7 +71,7 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
     list_select_related = ['profile_image']
-
+    list_per_page = 50
 
 admin.site.register(User, UserAdmin)
 admin.site.register(ImageProfile)

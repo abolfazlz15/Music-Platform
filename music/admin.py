@@ -21,6 +21,7 @@ class MusicAdmin(admin.ModelAdmin):
     actions = ['make_published', 'make_depublish']
     list_select_related = ['category']
     filter_horizontal = ['artist']
+    list_per_page = 50
 
     def get_artist(self, obj):
         return "\n ,".join([p.name for p in obj.artist.all()])

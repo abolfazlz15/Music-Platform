@@ -5,7 +5,12 @@ from django.contrib.auth.models import Group
 
 from accounts.forms import UserChangeForm, UserCreationForm
 from accounts.models import Artist, ImageProfile, User
+from django.utils.translation import gettext_lazy as _
 
+
+admin.site.site_header = _('Music Platform')
+admin.site.site_title = _('Music Platform')
+admin.site.index_title = _('Music Platform Management')
 
 class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
@@ -55,10 +60,10 @@ class UserAdmin(BaseUserAdmin):
                     'is_active', 'get_jalali_date')
     list_filter = ('is_admin', 'is_active', 'is_superuser')
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('username',
+        (None, {'fields': ('email', _('password'))}),
+        (_('Personal info'), {'fields': ('username',
          'profile_image', 'get_jalali_date')}),
-        ('Permissions', {'fields': ('is_admin', 'is_active', 'is_superuser')}),
+        (_('Permissions'), {'fields': ('is_admin', 'is_active', 'is_superuser')}),
     )
     readonly_fields = ('get_jalali_date',)
     add_fieldsets = (

@@ -14,14 +14,21 @@ class UserSerializer(serializers.ModelSerializer):
 class PlayListSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     user = serializers.SerializerMethodField(read_only=True)
+    cover = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Playlist
-        fields = ('id', 'name', 'user')
+        fields = ('id', 'name', 'user', 'cover')
 
     def get_user(self, obj):
         serializer = UserSerializer(instance=obj.user)
         return serializer.data
+    
+    def get_cover(self, obj):
+        music = obj.songs.first() 
+        if music:
+            return music.cover.url
+        return None
 
 
 class PlayListDetailSerializer(serializers.ModelSerializer):

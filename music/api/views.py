@@ -143,7 +143,7 @@ class MusicSearchView(generics.GenericAPIView):
             music_serializer = serializers.MusicListSerializer(instance=music, context={'request': request}, many=True)
 
             # user
-            user = User.objects.filter(username__icontains=search)
+            user = User.objects.filter(username__icontains=search).exclude(id=request.user.id)
             user_serializer = UserSerializer(instance=user, many=True, context={'request': request})
 
             # artist

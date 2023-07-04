@@ -14,7 +14,7 @@ class UserPlayListView(APIView):
 
     def get(self, request, pk):
         queryset = Playlist.objects.select_related('user').filter(user__id=pk)
-        serializer = self.serializer_class(instance=queryset, many=True)
+        serializer = self.serializer_class(instance=queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

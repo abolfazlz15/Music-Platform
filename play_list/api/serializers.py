@@ -25,9 +25,11 @@ class PlayListSerializer(serializers.ModelSerializer):
         return serializer.data
     
     def get_cover(self, obj):
+        request = self.context.get('request')
         music = obj.songs.first() 
         if music:
-            return music.cover.url
+            cover = music.cover.url
+            return request.build_absolute_uri(cover)
         return None
 
 

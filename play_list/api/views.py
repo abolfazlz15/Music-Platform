@@ -7,13 +7,13 @@ from music.models import Music
 from play_list.api import permissions as custom_permissions
 from play_list.api import serializers
 from play_list.models import Playlist
-
+from django.db.models import Count
 
 class UserPlayListView(APIView):
     serializer_class = serializers.PlayListSerializer
 
     def get(self, request, pk):
-        queryset = Playlist.objects.select_related('user').filter(user__id=pk)
+        queryset = Playlist.objects.select_related('user').filter(user__id=pk).annotate(number_of_songs=Count('songs'))
         serializer = self.serializer_class(instance=queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 

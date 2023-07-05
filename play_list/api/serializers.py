@@ -19,7 +19,7 @@ class PlayListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Playlist
-        fields = ('id', 'name', 'user', 'number_of_songs')
+        fields = ('id', 'name', 'user', 'cover', 'number_of_songs')
 
     def get_user(self, obj):
         serializer = UserSerializer(instance=obj.user)

@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -7,7 +8,7 @@ from music.models import Music
 from play_list.api import permissions as custom_permissions
 from play_list.api import serializers
 from play_list.models import Playlist
-from django.db.models import Count
+
 
 class UserPlayListView(APIView):
     serializer_class = serializers.PlayListSerializer
@@ -28,7 +29,7 @@ class UserDetailPlayListView(APIView):
 
 
 class UserCreatePlayListView(APIView):
-    serializer_class = serializers.PlayListCreateSerializer
+    serializer_class = serializers.PlayListUpdateAndCreateSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -41,7 +42,7 @@ class UserCreatePlayListView(APIView):
 
 
 class UserUpdatePlayListView(APIView):
-    serializer_class = serializers.PlayListCreateSerializer
+    serializer_class = serializers.PlayListUpdateAndCreateSerializer
     permission_classes = [custom_permissions.IsAuthorOrReadOnly]
 
     def put(self, request, pk):
@@ -65,7 +66,7 @@ class DeletePlayListView(APIView):
 
 
 class PlaylistAddMusicView(generics.UpdateAPIView):
-    serializer_class = serializers.PlayListSerializer
+    serializer_class = serializers.PlaylistAddAndRemoveSerializer
     permission_classes = [custom_permissions.IsAuthorOrReadOnly]
 
     def put(self, request, pk, *args, **kwargs):
@@ -89,7 +90,7 @@ class PlaylistAddMusicView(generics.UpdateAPIView):
 
 
 class PlaylistRemoveMusicView(generics.DestroyAPIView):
-    serializer_class = serializers.PlayListSerializer
+    serializer_class = serializers.PlaylistAddAndRemoveSerializer
     permission_classes = [custom_permissions.IsAuthorOrReadOnly]
 
     def delete(self, request, pk):

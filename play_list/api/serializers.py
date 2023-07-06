@@ -33,14 +33,6 @@ class PlayListSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(cover)
         return None
 
-    def get_cover(self, obj):
-        request = self.context.get('request')
-        music = obj.songs.first() 
-        if music:
-            cover = music.cover.url
-            return request.build_absolute_uri(cover)
-        return None
-
     def get_number_of_songs(self, obj):
         return obj.number_of_songs
 
@@ -58,9 +50,17 @@ class PlayListDetailSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class PlayListCreateSerializer(serializers.ModelSerializer):
+class PlayListUpdateAndCreateSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
 
     class Meta:
         model = Playlist
         fields = ('name', 'user')
+
+
+class PlaylistAddAndRemoveSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Playlist
+        fields = ('id', 'name', 'user')

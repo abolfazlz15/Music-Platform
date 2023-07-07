@@ -12,6 +12,7 @@ from music.models import (Category, ChooseMusicByCategory, FavoriteMusic,
                           HomeSlider, Music)
 from music.pagination import CustomPagination
 
+
 # Home API Views
 class PopularMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
@@ -109,11 +110,12 @@ class CategoryDetailView(generics.ListAPIView):
 
 class InternationalMusicList(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
-    queryset = Music.objects.published().filter(type='International')
+    queryset = Music.objects.published().filter(type='International')[:10]
 
 
 class UserFavoriteMusicView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         favorite_music_ids = FavoriteMusic.objects.filter(user__id=self.kwargs['pk']).values_list('music_id', flat=True)

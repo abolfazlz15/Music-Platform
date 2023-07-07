@@ -130,15 +130,19 @@ class ArtistSerializer(serializers.ModelSerializer):
         return artist.musics.count()
 
     def get_recent_music(self, artist):
+        """
+        Retrieve 10 most recent artist music tracks
+        """
         request = self.context.get('request')
-        # Get the 3 most recently added music tracks
-        musics = artist.musics.order_by('-created_at')[:3]
+        musics = artist.musics.order_by('-created_at')[:10]
         return MusicListSerializer(musics, many=True, context={'request': request}).data
 
     def get_popular_music(self, artist):
+        """
+        Retrieve 10 most popular music tracks
+        """
         request = self.context.get('request')
-        # Get the 3 most popular music tracks
-        musics = artist.musics.annotate(play_count=Count('favorite_musics')).filter(status=True).order_by('-play_count')[:3]
+        musics = artist.musics.annotate(play_count=Count('favorite_musics')).filter(status=True).order_by('-play_count')[:10]
         return MusicListSerializer(musics, many=True, context={'request': request}).data
     
     def get_image(self, obj):

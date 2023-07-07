@@ -10,7 +10,7 @@ from accounts.models import Artist, User
 from music.api import serializers
 from music.models import (Category, ChooseMusicByCategory, FavoriteMusic,
                           HomeSlider, Music)
-
+from music.pagination import CustomPagination
 
 # Home API Views
 class PopularMusicListView(generics.ListAPIView):
@@ -65,9 +65,9 @@ class SliderHomePage(generics.ListAPIView):
     def get_queryset(self):
         queryset = HomeSlider.objects.filter(status=True)
         return queryset
-
-
 # End Home API Views
+
+
 class MusicDetailView(generics.GenericAPIView):
     serializer_class = serializers.MusicDetailSerializer
 
@@ -99,8 +99,9 @@ class CateogryListView(generics.ListAPIView):
 
 
 class CategoryDetailView(generics.ListAPIView):
+    pagination_class = CustomPagination
     serializer_class = serializers.MusicListSerializer
-
+    
     def get_queryset(self):
         queryset = Music.objects.published().filter(category__id=self.kwargs['pk'])
         return queryset
@@ -131,9 +132,6 @@ class UserAddFavoriteMusicView(generics.GenericAPIView):
         except:
             FavoriteMusic.objects.create(user=request.user, music=music)
             return Response({'status': True, 'result': 'like'}, status=status.HTTP_200_OK)
-
-
-
 
 
 class MusicSearchView(APIView):

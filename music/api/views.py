@@ -1,13 +1,16 @@
-from django.db.models import Count, Q
+from django.core.paginator import Paginator
+from django.db.models import Count, Max, Min, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
-from django.db.models import Max, Min
+from rest_framework.views import APIView
+
 from accounts.api.serializers import ArtistListSerializer, UserSerializer
 from accounts.models import Artist, User
 from music.api import serializers
 from music.models import (Category, ChooseMusicByCategory, FavoriteMusic,
                           HomeSlider, Music)
+from music.pagination import CustomPagination
 
 
 # Home API Views
@@ -63,9 +66,9 @@ class SliderHomePage(generics.ListAPIView):
     def get_queryset(self):
         queryset = HomeSlider.objects.filter(status=True)
         return queryset
-
-
 # End Home API Views
+
+
 class MusicDetailView(generics.GenericAPIView):
     serializer_class = serializers.MusicDetailSerializer
 
@@ -97,8 +100,9 @@ class CateogryListView(generics.ListAPIView):
 
 
 class CategoryDetailView(generics.ListAPIView):
+    pagination_class = CustomPagination
     serializer_class = serializers.MusicListSerializer
-
+    
     def get_queryset(self):
         queryset = Music.objects.published().filter(category__id=self.kwargs['pk'])
         return queryset
@@ -106,11 +110,12 @@ class CategoryDetailView(generics.ListAPIView):
 
 class InternationalMusicList(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
-    queryset = Music.objects.published().filter(type='International')
+    queryset = Music.objects.published().filter(type='International')[:10]
 
 
 class UserFavoriteMusicView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         favorite_music_ids = FavoriteMusic.objects.filter(user__id=self.kwargs['pk']).values_list('music_id', flat=True)
@@ -131,25 +136,49 @@ class UserAddFavoriteMusicView(generics.GenericAPIView):
             return Response({'status': True, 'result': 'like'}, status=status.HTTP_200_OK)
 
 
-class MusicSearchView(generics.GenericAPIView):
+class MusicSearchView(APIView):
+    """
+    View for search  in (music, artist, user) fields
+    """
+    def paginate_queryset(self, queryset, per_page, page_number):
+        paginator = Paginator(queryset, per_page)
+        page = paginator.get_page(page_number)
+        return {
+            'count': paginator.count,
+            'next': page.next_page_number() if page.has_next() else None,
+            'previous': page.previous_page_number() if page.has_previous() else None,
+            'results': page
+        }
+    
     def get(self, request):
         search = request.query_params.get('search', None)
-        if search:
-            # music 
-            music = Music.objects.published().filter(
-                Q(title__icontains=search) |
-                Q(artist__name__icontains=search)
-            ).distinct()
-            music_serializer = serializers.MusicListSerializer(instance=music, context={'request': request}, many=True)
-
-            # user
-            user = User.objects.filter(username__icontains=search).exclude(id=request.user.id)
-            user_serializer = UserSerializer(instance=user, many=True, context={'request': request})
-
-            # artist
-            artist = Artist.objects.filter(name__icontains=search)
-            artist_serializer = ArtistListSerializer(instance=artist, many=True, context={'request': request})
-            return Response(
-                {'music': music_serializer.data, 'user': user_serializer.data, 'artist': artist_serializer.data})
-        else:
+        if not search:
             return Response({'result': 'there is no content'})
+
+
+        music = Music.objects.published().filter(
+            Q(title__icontains=search) |
+            Q(artist__name__icontains=search)
+        ).distinct()
+        music_data = self.paginate_queryset(music, per_page=1, page_number=request.query_params.get('music_page', 1))
+        music_serializer = serializers.MusicListSerializer(instance=music_data['results'], context={'request': request}, many=True)
+
+        users = User.objects.filter(username__icontains=search).exclude(id=request.user.id)
+        user_data = self.paginate_queryset(users, per_page=1, page_number=request.query_params.get('user_page', 1))
+        user_serializer = UserSerializer(instance=user_data['results'], many=True, context={'request': request})
+
+        artists = Artist.objects.filter(name__icontains=search)
+        artist_data = self.paginate_queryset(artists, per_page=1, page_number=request.query_params.get('artist_page', 1))
+        artist_serializer = ArtistListSerializer(instance=artist_data['results'], many=True, context={'request': request})
+
+        response_data = {
+            'music': music_data,
+            'user': user_data,
+            'artist': artist_data
+        }
+
+        response_data['music']['results'] = music_serializer.data
+        response_data['user']['results'] = user_serializer.data
+        response_data['artist']['results'] = artist_serializer.data
+
+        return Response(response_data)

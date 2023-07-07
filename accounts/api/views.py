@@ -131,12 +131,7 @@ class ArtistProfileView(generics.GenericAPIView):
         serializer = serializers.ArtistSerializer(instance=instance, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-class ArtistListView(generics.ListAPIView):
-    serializer_class = serializers.ArtistListSerializer
-    queryset = Artist.objects.all()
-
-    
+   
 class ForgotPasswordView(APIView):
     serializer_class = serializers.ForgotPasswordSerializer
     permission_classes = [permissions.AllowAny]

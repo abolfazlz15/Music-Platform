@@ -115,5 +115,5 @@ class PlaylistRemoveMusicView(generics.DestroyAPIView):
 
 class ApprovedPlaylistView(generics.ListAPIView):
     serializer_class = serializers.PlayListSerializer
-    queryset = Playlist.objects.filter(approved_playlist=True)
+    queryset = Playlist.objects.filter(approved_playlist=True).annotate(number_of_songs=Count('songs'))
     

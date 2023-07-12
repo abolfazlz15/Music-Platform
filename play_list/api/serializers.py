@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PlayListSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    user = serializers.SerializerMethodField(read_only=True)
+    user = serializers.SerializerMethodField(read_only=True, required=False)
     cover = serializers.SerializerMethodField(read_only=True)
     number_of_songs = serializers.SerializerMethodField(read_only=True)
 

@@ -160,15 +160,15 @@ class MusicSearchView(APIView):
             Q(title__icontains=search) |
             Q(artist__name__icontains=search)
         ).distinct()
-        music_data = self.paginate_queryset(music, per_page=1, page_number=request.query_params.get('music_page', 1))
+        music_data = self.paginate_queryset(music, per_page=15, page_number=request.query_params.get('music_page', 1))
         music_serializer = serializers.MusicListSerializer(instance=music_data['results'], context={'request': request}, many=True)
 
         users = User.objects.filter(username__icontains=search).exclude(id=request.user.id)
-        user_data = self.paginate_queryset(users, per_page=1, page_number=request.query_params.get('user_page', 1))
+        user_data = self.paginate_queryset(users, per_page=15, page_number=request.query_params.get('user_page', 1))
         user_serializer = UserSerializer(instance=user_data['results'], many=True, context={'request': request})
 
         artists = Artist.objects.filter(name__icontains=search)
-        artist_data = self.paginate_queryset(artists, per_page=1, page_number=request.query_params.get('artist_page', 1))
+        artist_data = self.paginate_queryset(artists, per_page=15, page_number=request.query_params.get('artist_page', 1))
         artist_serializer = ArtistListSerializer(instance=artist_data['results'], many=True, context={'request': request})
 
         response_data = {

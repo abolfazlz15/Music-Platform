@@ -33,7 +33,6 @@ THIRD_PARTY_APPS = [
     'django_cleanup.apps.CleanupConfig',
     'admin_persian',
     'ckeditor',
-    'admin_interface',
     'colorfield',
 ]
 

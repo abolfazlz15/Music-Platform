@@ -115,7 +115,6 @@ class InternationalMusicList(generics.ListAPIView):
 
 class UserFavoriteMusicView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
-    pagination_class = CustomPagination
 
     def get_queryset(self):
         favorite_music_ids = FavoriteMusic.objects.filter(user__id=self.kwargs['pk']).values_list('music_id', flat=True)

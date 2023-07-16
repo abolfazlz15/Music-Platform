@@ -6,7 +6,6 @@ charset-normalizer==3.1.0
 coreapi==2.3.3
 coreschema==0.0.4
 Django==4.1.6
-django-admin-interface==0.24.2
 django-admin-persian-fonts==0.2
 django-ckeditor==6.5.1
 django-cleanup==6.0.0

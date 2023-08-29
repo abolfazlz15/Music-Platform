@@ -10,6 +10,7 @@ class Playlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='playlists', verbose_name=_('user'), null=True, blank=True)
     songs = models.ManyToManyField(Music, related_name='playlists', blank=True, verbose_name=_('songs'))
     approved_playlist = models.BooleanField(default=False)
+    is_international = models.BooleanField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'پلی لیست'

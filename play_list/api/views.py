@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from music.models import Music
 from play_list.api import permissions as custom_permissions
 from play_list.api import serializers
-from play_list.models import Playlist
+from play_list.models import Playlist, ApprovedPlaylist
 
 
 class UserPlayListView(APIView):
@@ -113,7 +113,15 @@ class PlaylistRemoveMusicView(generics.DestroyAPIView):
                         status=status.HTTP_204_NO_CONTENT)
 
 
-class ApprovedPlaylistView(generics.ListAPIView):
-    serializer_class = serializers.PlayListSerializer
-    queryset = Playlist.objects.filter(approved_playlist=True).annotate(number_of_songs=Count('songs'))
+class ApprovedPlaylistView(APIView):
     
+    def get(self, request):
+        international_playlist = ApprovedPlaylist.objects.filter(is_international=True)[:5]
+        iranian_playlist = ApprovedPlaylist.objects.filter(is_international=False)[:5]
+        serializer = serializers.ApprovedPlaylistSerializer(international_playlist, many=True)
+        serializer1 = serializers.ApprovedPlaylistSerializer(iranian_playlist, many=True)
+        queryset = {
+            'international_playlist': serializer.data,
+            'iranian_playlist': serializer1.data,
+        }
+        return Response(queryset)

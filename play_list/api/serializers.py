@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from accounts.models import User
 from music.api.serializers import MusicListSerializer
-from play_list.models import Playlist
+from play_list.models import Playlist, ApprovedPlaylist
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -64,3 +64,10 @@ class PlaylistAddAndRemoveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Playlist
         fields = ('id', 'name', 'user')
+
+
+class ApprovedPlaylistSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ApprovedPlaylist
+        fields = ('id', 'name', 'cover')

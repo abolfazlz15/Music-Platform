@@ -71,3 +71,23 @@ class ApprovedPlaylistSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApprovedPlaylist
         fields = ('id', 'name', 'cover')
+
+    def get_cover(self, obj):
+        request = self.context.get('request')
+        music = obj.songs.first() 
+        if music:
+            cover = music.cover.url
+            return request.build_absolute_uri(cover)
+        return None
+
+class ApprovedPlaylistDetailSerializer(serializers.ModelSerializer):
+    music = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ApprovedPlaylist
+        fields = ('id', 'name' , 'cover', 'music')
+
+    def get_music(self, obj):
+        request = self.context.get('request')
+        serializer = MusicListSerializer(instance=obj.songs.all(), many=True, context={'request': request})
+        return serializer.data

@@ -59,12 +59,13 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('email', 'username', 'is_admin',
                     'is_active', 'get_jalali_date')
     list_filter = ('is_admin', 'is_active', 'is_superuser')
-    fieldsets = (
-        (None, {'fields': ('email', _('password'))}),
-        (_('Personal info'), {'fields': ('username',
-         'profile_image', 'get_jalali_date')}),
-        (_('Permissions'), {'fields': ('is_admin', 'is_active', 'is_superuser')}),
-    )
+
+    fieldsets = [
+        (None, {'fields': ['email', 'password']}),
+        ('Personal info', {'fields': ['username', 'profile_image', 'get_jalali_date']}),
+        ('Permissions', {'fields': ['is_admin', 'is_superuser', 'is_active']}),
+    ]
+
     readonly_fields = ('get_jalali_date',)
     add_fieldsets = (
         (None, {

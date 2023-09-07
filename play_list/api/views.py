@@ -118,8 +118,8 @@ class ApprovedPlaylistView(APIView):
     def get(self, request):
         international_playlist = ApprovedPlaylist.objects.filter(is_international=True)[:5]
         iranian_playlist = ApprovedPlaylist.objects.filter(is_international=False)[:5]
-        iranian_playlist_serializer = serializers.ApprovedPlaylistSerializer(international_playlist, many=True, context={'request': request})
-        international_playlist_serializer = serializers.ApprovedPlaylistSerializer(iranian_playlist, many=True, context={'request': request})
+        iranian_playlist_serializer = serializers.ApprovedPlaylistSerializer(iranian_playlist, many=True, context={'request': request})
+        international_playlist_serializer = serializers.ApprovedPlaylistSerializer(international_playlist, many=True, context={'request': request})
 
         queryset = {
             'international_playlist': international_playlist_serializer.data,

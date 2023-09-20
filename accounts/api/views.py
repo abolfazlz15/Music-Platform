@@ -128,7 +128,7 @@ class ChangePasswordView(UpdateAPIView):
 class ArtistProfileView(generics.GenericAPIView):
     def get(self, request, pk):
         instance = Artist.objects.get(id=pk)
-        serializer = serializers.ArtistSerializer(instance=instance, context={'request': request})
+        serializer = serializers.ArtistDetailSerializer(instance=instance, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
    

@@ -7,7 +7,7 @@ from music.models import Category, HomeSlider, Music
 class ArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'image')
 
 
 class MusicByCategorySerializer(serializers.ModelSerializer):

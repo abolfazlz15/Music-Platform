@@ -27,7 +27,7 @@ class RecentMusicListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
-        queryset = Music.objects.published().order_by('-created_at')
+        queryset = Music.objects.published().filter(type='Iranian').order_by('-created_at')[:10]
         return queryset
 
 
@@ -39,7 +39,7 @@ class MusicByCategoryListView(generics.ListAPIView):
         if category_object is None:
             return Music.objects.none()
         else:
-            queryset = Music.objects.published().filter(category__id=category_object.category.id)
+            queryset = Music.objects.published().filter(category__id=category_object.category.id).order_by('-created_at')[:10]
             return queryset
 
     def get_serializer_context(self):
@@ -56,7 +56,7 @@ class MusicByTrendCategoryListView(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
 
     def get_queryset(self):
-        queryset = Music.objects.published().filter(category__title='trend')
+        queryset = Music.objects.published().filter(category__title='trend').order_by('-created_at')[:10]
         return queryset
 
 
@@ -110,7 +110,7 @@ class CategoryDetailView(generics.ListAPIView):
 
 class InternationalMusicList(generics.ListAPIView):
     serializer_class = serializers.MusicListSerializer
-    queryset = Music.objects.published().filter(type='International')[:10]
+    queryset = Music.objects.published().filter(type='International').order_by('-created_at')[:10]
 
 
 class UserFavoriteMusicView(generics.ListAPIView):

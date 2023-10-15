@@ -3,6 +3,8 @@
 
 # my ignore
 static/
+tmp/
+passenger_wsgi.py
 
 ### Django ###
 *.log

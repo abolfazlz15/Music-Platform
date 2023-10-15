@@ -36,6 +36,7 @@ class Music(models.Model):
     title = models.CharField(max_length=150, verbose_name=_('title'))
     artist = models.ManyToManyField(Artist, related_name='musics', verbose_name=_('artist'))
     url = models.URLField(verbose_name=_('url'))
+    music_file = models.FileField(upload_to='music/', null=True, blank=True, verbose_name=_('music file'))
     cover = models.ImageField(upload_to='image/music_cover', null=True, blank=True, verbose_name=_('music cover'))
     text = RichTextField(verbose_name=_('text'), null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='musics', verbose_name=_('category'))

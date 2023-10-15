@@ -116,7 +116,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         return value
 
 
-class ArtistSerializer(serializers.ModelSerializer):
+class ArtistDetailSerializer(serializers.ModelSerializer):
     music_quantity = serializers.SerializerMethodField()
     recent_music = serializers.SerializerMethodField()
     popular_music = serializers.SerializerMethodField()

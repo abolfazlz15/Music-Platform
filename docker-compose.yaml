@@ -1,0 +1,44 @@
+
+services:
+  db:
+    container_name: music_platform_db
+    image: postgres:15.5-alpine3.17
+    environment:
+      - POSTGRES_DB=DRF_file_converter
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DATABASE-HOST=postgres
+      - DATABASE-PORT=5432
+    networks:
+      - main
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    container_name: music_platform
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code/
+      - static:/usr/src/app/static
+      - media:/usr/src/app/medias
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    networks:
+      - main
+    restart: always
+  
+networks:
+  main:
+
+volumes:
+  postgres_data:
+  media:
+  static:

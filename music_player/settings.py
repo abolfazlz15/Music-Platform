@@ -112,7 +112,7 @@ DATABASES = {
         'NAME': os.environ.get('DATABASE-NAME', 'DRF_file_converter'),
         'USER': os.environ.get('DATABASE-USER', 'postgres'),
         'PASSWORD': os.environ.get('DATABASE-PASSWORD', 'postgres'),
-        'HOST': os.environ.get('DATABASE-HOST', 'db'), # or user IP address that your DB is hosted on
+        'HOST': os.environ.get('DATABASE-HOST', 'localhost'), # or user IP address that your DB is hosted on
         'PORT': os.environ.get('DATABASE-PORT', '5432'),
     }
 }

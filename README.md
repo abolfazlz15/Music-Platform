@@ -2,11 +2,9 @@
 A web application powered by Django framework and DRF
 
 # Some features:
-- Write testing for APIs, models, URLs
-- Authentication (JWT and OTP code)
+- Authentication (JWT and OTP)
 - Documented by Swagger
-- Use redis for caching (coming soon)
-- Dockerized (coming soon)
+- Dockerized
 - Useing the nginx (coming soon)
 
 # How to run project
@@ -21,3 +19,9 @@ git clone https://github.com/abolfazlz15/Music-Platform.git
 - Run `pip install requirements.txt`
 - Run `python manage.py runserve`
 - Visit `http://127.0.0.1:8000/swagger` to see the api documentation
+## Run project with docker
+make sure you`ve installed docker
+- In terminal: `git clone https://github.com/abolfazlz15/Music-Platform.git`
+- cd `/Music-Platform` Where the docker-compose.yaml is
+- In terminal: `docker-compose up -d`
+- Visit http://0.0.0.0:8000/ 

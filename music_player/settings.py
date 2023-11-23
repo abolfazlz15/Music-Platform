@@ -25,6 +25,7 @@ LOCAL_APPS = [
     'music.apps.MusicConfig',
     'play_list.apps.PlayListConfig',
     'pages.apps.PagesConfig',
+    'subscription.apps.SubscriptionConfig',
 
 ]
 
@@ -109,7 +110,7 @@ WSGI_APPLICATION = 'music_player.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE-NAME', 'DRF_file_converter'),
+        'NAME': os.environ.get('DATABASE-NAME', 'dinofy_db'),
         'USER': os.environ.get('DATABASE-USER', 'postgres'),
         'PASSWORD': os.environ.get('DATABASE-PASSWORD', 'postgres'),
         'HOST': os.environ.get('DATABASE-HOST', 'localhost'), # or user IP address that your DB is hosted on

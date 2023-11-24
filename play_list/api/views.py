@@ -68,7 +68,7 @@ class DeletePlayListView(APIView):
 
 class PlaylistAddMusicView(generics.UpdateAPIView):
     serializer_class = serializers.PlaylistAddAndRemoveSerializer
-    permission_classes = [custom_permissions.IsAuthorOrReadOnly]
+    permission_classes = [custom_permissions.IsAuthorOrReadOnly, custom_permissions.AddMusicToPlaylistSubscriber]
 
     def put(self, request, pk, *args, **kwargs):
         try:

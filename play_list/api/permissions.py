@@ -27,3 +27,20 @@ class PlaylistSubscriber(permissions.BasePermission):
                 return False
             else:
                 return True
+
+
+class AddMusicToPlaylistSubscriber(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        print()
+        try:
+            if request.user.subscription.is_active:
+                return True 
+            else:
+                self.message = 'Your subscription has expired'
+                return obj.songs.count() < 3
+        except:
+            if obj.songs.count() >= 3:
+                self.message = 'you cant add more msuic to playlist please use subscription'
+                return False
+            else:
+                return True

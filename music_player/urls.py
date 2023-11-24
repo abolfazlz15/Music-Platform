@@ -30,6 +30,7 @@ urlpatterns = [
     path('accounts/', include('accounts.api.urls')),
     path('music/', include('music.api.urls')),
     path('page/', include('pages.api.urls')),
+    path('subscription/', include('subscription.api.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [

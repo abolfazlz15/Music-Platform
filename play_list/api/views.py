@@ -30,6 +30,7 @@ class UserDetailPlayListView(APIView):
 
 class UserCreatePlayListView(APIView):
     serializer_class = serializers.PlayListUpdateAndCreateSerializer
+    permission_classes = [custom_permissions.PlaylistSubscriber]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -38,7 +39,7 @@ class UserCreatePlayListView(APIView):
             serializer.validated_data['user'] = request.user
             serializer.save()
             return Response({'result': 'playlist created', 'success': True}, status=status.HTTP_201_CREATED)
-        return Response({'result': serializer.errors, 'success': True}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'result': serializer.errors, 'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserUpdatePlayListView(APIView):

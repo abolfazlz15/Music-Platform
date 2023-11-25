@@ -6,11 +6,12 @@ from music import models
 admin.site.register(models.FavoriteMusic)
 admin.site.register(models.ChooseMusicByCategory)
 admin.site.register(models.HomeSlider)
+admin.site.register(models.IPAddress)
 
 @admin.register(models.Music)
 class MusicAdmin(admin.ModelAdmin):
     # for show customization list objects
-    fields = ('title', 'artist', 'cover', 'text', 'category', 'type', 'status', 'url', 'music_file', 'created_at')
+    fields = ('title', 'artist', 'cover', 'text', 'category', 'type', 'status', 'url', 'music_file', 'views', 'created_at')
     list_display = ('show_cover', 'title', 'get_artist', 'status', 'category')
     list_filter = ('status', 'type', 'created_at')
     search_fields = ('title', 'created_at', 'artist__name')

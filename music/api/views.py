@@ -9,7 +9,7 @@ from accounts.api.serializers import ArtistListSerializer, UserSerializer
 from accounts.models import Artist, User
 from music.api import serializers
 from music.models import (Category, ChooseMusicByCategory, FavoriteMusic,
-                          HomeSlider, Music)
+                          HomeSlider, IPAddress, Music)
 from music.pagination import CustomPagination
 
 
@@ -82,6 +82,11 @@ class MusicDetailView(generics.GenericAPIView):
                                                             'related_music': related_music,
                                                             'skip_music': {'next_music_id': next_music_id,
                                                                            'previous_music_id': previous_music_id}})
+        
+        client_ip = self.get_client_ip(request)
+        self.add_view_music(client_ip, instance)
+
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_next_music_id(self, instance):
@@ -90,6 +95,25 @@ class MusicDetailView(generics.GenericAPIView):
     def get_previous_music_id(self, instance):
         return Music.objects.filter(id__lt=instance.id, category=instance.category).aggregate(Max('id')).get('id__max')
 
+    def get_client_ip(self, request):
+        # The X-Forwarded-For header is often used to capture the original client IP
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+            
+        try:
+            ip_address = IPAddress.objects.get(ip_address=ip)
+        except IPAddress.DoesNotExist:
+            ip_address = IPAddress(ip_address=ip)
+            ip_address.save()
+        return ip_address
+    
+    def add_view_music(self, client_ip, instance):
+        if client_ip not in instance.views.all():
+            instance.views.add(client_ip)
+        
 
 class CateogryListView(generics.ListAPIView):
     serializer_class = serializers.CategoryListSerializer

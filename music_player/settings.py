@@ -35,6 +35,7 @@ THIRD_PARTY_APPS = [
     'admin_persian',
     'ckeditor',
     'colorfield',
+    'django_celery_beat',
 ]
 
 INSTALLED_APPS = [
@@ -59,8 +60,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'music_player.urls'
 

@@ -44,6 +44,7 @@ class Music(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True)
+    views = models.ManyToManyField('IPAddress', related_name='musics', blank=True, verbose_name=_('views'))
     objects = MusicManager()
 
     class Meta:
@@ -102,3 +103,14 @@ class HomeSlider(models.Model):
     class Meta:
         verbose_name = 'اسلایدر صفحه خانه'
         verbose_name_plural = 'اسلایدر های صفحه خانه'
+
+
+class IPAddress(models.Model):
+    ip_address = models.GenericIPAddressField(verbose_name='ادرس آی پی')
+
+    class Meta:
+        verbose_name = 'آدرس آی پی'
+        verbose_name_plural = 'آدرس های آی پی'
+
+    def __str__(self):
+        return self.ip_address

@@ -98,8 +98,8 @@ class HomeSlider(models.Model):
     image = models.ImageField(upload_to='image/home_slider_image', null=True, blank=True)
     url = models.URLField(null=True, blank=True)
     status = models.BooleanField(default=True)
+    music_id = models.ForeignKey(Music, on_delete=models.CASCADE, blank=True, null=True)
     
- 
     class Meta:
         verbose_name = 'اسلایدر صفحه خانه'
         verbose_name_plural = 'اسلایدر های صفحه خانه'

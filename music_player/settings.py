@@ -108,16 +108,27 @@ WSGI_APPLICATION = 'music_player.wsgi.application'
 #         }
 #     }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE-NAME', 'dinofy_db'),
-        'USER': os.environ.get('DATABASE-USER', 'postgres'),
-        'PASSWORD': os.environ.get('DATABASE-PASSWORD', 'postgres'),
-        'HOST': os.environ.get('DATABASE-HOST', 'localhost'), # or user IP address that your DB is hosted on
-        'PORT': os.environ.get('DATABASE-PORT', '5432'),
+if config('ENGINE') == 'sqlite3':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite',
+        }
     }
-}
+elif config('ENGINE') == 'mysql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config('NAME'),
+            'USER': config('USER'),
+            'PASSWORD': config('PASSWORD'),
+            'HOST': config('HOST'),
+            'OPTIONS': {
+                'sql_mode': 'traditional',
+            }
+        }
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from pages.models import Ticket, TicketTitle, AboutUs
+from django.utils.html import strip_tags
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -19,4 +20,11 @@ class AboutUsSerializer(serializers.ModelSerializer):
         model = AboutUs
         fields = '__all__'
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+
+        representation['description'] = strip_tags(instance.description)
+
+        return representation
         

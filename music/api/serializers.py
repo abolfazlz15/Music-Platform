@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from accounts.models import Artist
 from music.models import Category, HomeSlider, Music
+from django.utils.html import strip_tags
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -86,6 +87,7 @@ class MusicDetailSerializer(serializers.ModelSerializer):
 
         skip_music = self.context.get('skip_music')
         representation['skip_music'] = skip_music
+        representation['text'] = strip_tags(instance.text)
 
         return representation
 

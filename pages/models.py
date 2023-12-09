@@ -38,6 +38,7 @@ class Ticket(models.Model):
 class AboutUs(models.Model):
     version = models.CharField(max_length=100, verbose_name=_('version'))
     description = RichTextField(verbose_name=_('description'), null=True, blank=True)
+    required_update = models.BooleanField(default=False, verbose_name=_('required update'))
 
     class Meta:
         verbose_name = 'درباره ما'

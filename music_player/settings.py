@@ -26,7 +26,7 @@ LOCAL_APPS = [
     'play_list.apps.PlayListConfig',
     'pages.apps.PagesConfig',
     'subscription.apps.SubscriptionConfig',
-
+    'settings.apps.SettingsConfig'
 ]
 
 THIRD_PARTY_APPS = [

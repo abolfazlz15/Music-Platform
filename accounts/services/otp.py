@@ -6,19 +6,17 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 
 
-class OTP:
-
+class OtpService:
     def __init__(self):
         self.otp_expiry_minutes = 1
 
-    def generate_otp(self, email):
+    def generate_otp(self, email: str) -> int:
         otp = randint(1000, 9999)
         cache.set(email, (otp, datetime.datetime.now()), self.otp_expiry_minutes * 60)
         self.send_otp(otp, email)
-
         return otp
 
-    def verify_otp(self, otp, email):
+    def verify_otp(self, otp: int, email: str) -> bool:
         stored_otp_info = cache.get(email)
         if stored_otp_info is None:
             return False
@@ -33,10 +31,10 @@ class OTP:
         else:
             return False
 
-    def clear_otp(self, email):
+    def clear_otp(self, email) -> None:
         cache.delete(email)
 
-    def send_otp(self, otp, email):
+    def send_otp(self, otp: int, email: str) -> None:
         mail_subject = 'فعال سازی اکانت'
         message = render_to_string('accounts/active_email.html', {
             'user': email,

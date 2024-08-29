@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from accounts.api import serializers
 from accounts.forms import ForotPasswordForm
 from accounts.models import Artist, ImageProfile, User
-from accounts.otp_service import OTP
+from accounts.services.otp import OTP
 
 
 class UserLoginView(APIView):

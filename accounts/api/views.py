@@ -10,6 +10,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views import generic
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, permissions, status
+from rest_framework.exceptions import ParseError
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,18 +18,20 @@ from rest_framework.views import APIView
 from accounts.api import serializers
 from accounts.forms import ForotPasswordForm
 from accounts.models import Artist, ImageProfile, User
-from accounts.services.otp import OTP
+from accounts.services.otp import OtpService
+from utils.response import response
 
 
 class UserLoginView(APIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = serializers.UserLoginSerializer
+   
     @swagger_auto_schema(request_body=serializers.UserLoginSerializer)
     def post(self, request):
         serializer = serializers.UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         result = serializer.save(validated_data=serializer.validated_data)
-        return Response(result, status=status.HTTP_200_OK)
+        return response(data=result, status=status.HTTP_200_OK)
 
 
 class UserRegisterView(APIView):
@@ -38,28 +41,31 @@ class UserRegisterView(APIView):
         serializer = serializers.UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
             clean_data = serializer.validated_data
-            otp_service = OTP()
+            otp_service = OtpService()
+            if otp_service.get_otp(clean_data['email']):
+                return response(error="code is already sent", status=status.HTTP_400_BAD_REQUEST)
+            
             otp_service.generate_otp(clean_data['email'])
             cache.set(key='register', value={'email': clean_data['email'], 'password': clean_data['password'], 'username': clean_data['username']}, timeout=300)
+            return response(data={'email': clean_data['email']}, status=status.HTTP_200_OK)
+        return Response({'errors': serializer.errors, 'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({'email': clean_data['email'], 'result': 'email sended', 'success': True}, status=status.HTTP_202_ACCEPTED)
-        return Response({'errors': serializer.errors, 'success': False}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-
-class GetOTPRegisterCodeView(APIView):
+class UserVerifyRegisterCodeView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = serializers.GetOTPRegisterCodeSerializer(data=request.data)
-        user_data = cache.get(key='register')
-        otp_service = OTP()
-        if user_data is None:
-            return Response({'error': 'this code not exist or invalid', 'success': False}, status=status.HTTP_404_NOT_FOUND)
+        otp_service = OtpService()
 
         if serializer.is_valid():
             clean_data = serializer.validated_data
+            user_data = cache.get(key='register')
+            print(user_data)
+            if user_data is None:
+                raise ParseError({'error': 'this code not exist or invalid'}, code=status.HTTP_404_NOT_FOUND)
 
-            if otp_service.verify_otp(otp=clean_data['code'], email=user_data['email']):
+            if otp_service.verify_otp(otp=clean_data['code'], email=clean_data['email']):
                 user = User.objects.create_user(email=user_data['email'], username=user_data['username'], password=user_data['password'])
                 result = serializer.save(validated_data=user)
                 return Response(result, status=status.HTTP_201_CREATED)
@@ -69,7 +75,6 @@ class GetOTPRegisterCodeView(APIView):
 
 
 class UserProfileView(APIView):
-
     def get(self, request, pk):
         user = get_object_or_404(User, id=pk)
         serializer = serializers.UserSerializer(instance=user, context={'request': request})
@@ -82,7 +87,6 @@ class ImageProfileListView(generics.ListAPIView):
 
 
 class UserUpdateProfileView(APIView):
-
     def put(self, request):
         user = request.user
         serializer = serializers.UserProfileUpdateSerializer(instance=user, data=request.data)

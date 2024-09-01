@@ -1,11 +1,12 @@
 from django.contrib.auth import authenticate, password_validation
-from rest_framework import serializers
+from django.db.models import Count
+from rest_framework import serializers, status
+from rest_framework.exceptions import ParseError
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.password_validation import validate_password
 
 from accounts.models import Artist, ImageProfile, User
 from music.api.serializers import MusicListSerializer
-from django.db.models import Count
+
 
 class ImageProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,7 +47,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         user = User.objects.filter(username=value)
         if user:
-            raise serializers.ValidationError({'error': 'this username exist'})
+            raise ParseError({'error': 'username already exists'}, code=status.HTTP_400_BAD_REQUEST)
         else:
             return value
 
@@ -60,17 +61,15 @@ class UserLoginSerializer(serializers.Serializer):
 
         if user:
             return user
-        raise serializers.ValidationError({'error': 'this user is not exist', 'success': False})
+        raise ParseError({"error": "user doesn't exist"}, code=status.HTTP_400_BAD_REQUEST)
 
     def save(self, validated_data):
         refresh = RefreshToken.for_user(validated_data)
         return ({
             'username': validated_data.username,
             'user_id': validated_data.id,
-            'success': True,
             'refresh': str(refresh),
             'access': str(refresh.access_token),
-
         })
 
 
@@ -92,6 +91,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 class GetOTPRegisterCodeSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=4)
+    email = serializers.EmailField()
 
     def save(self, validated_data):
         refresh = RefreshToken.for_user(validated_data)
@@ -108,7 +108,6 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=False)
 
     def validate_new_password(self, value):
-        # use django validation for password 
         try:
             password_validation.validate_password(value, self.instance)
         except serializers.ValidationError as error:

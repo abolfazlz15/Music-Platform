@@ -11,11 +11,11 @@ urlpatterns = [
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     # login URL
-    path('login', views.UserLoginView.as_view(), name='login'),
+    path('login/', views.UserLoginView.as_view(), name='login'),
 
     # register URL
-    path('register', views.UserRegisterView.as_view(), name='register'),
-    path('check', views.GetOTPRegisterCodeView.as_view(), name='check-otp'),
+    path('register/', views.UserRegisterView.as_view(), name='register'),
+    path('register/verify/', views.UserVerifyRegisterCodeView.as_view(), name='verify_register_otp'),
 
     # user URL
     path('profile/<int:pk>', views.UserProfileView.as_view(), name='profile'),

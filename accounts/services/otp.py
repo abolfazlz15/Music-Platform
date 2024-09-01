@@ -46,3 +46,8 @@ class OtpService:
         )
 
         email.send()
+    
+    @staticmethod
+    def get_otp(key: str) -> int:
+        if key:
+            return cache.get(key.lower())

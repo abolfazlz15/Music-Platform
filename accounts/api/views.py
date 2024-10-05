@@ -19,6 +19,7 @@ from accounts.api import serializers
 from accounts.forms import ForotPasswordForm
 from accounts.models import Artist, ImageProfile, User
 from accounts.services.otp import OtpService
+from accounts.services.user_repository import UserRepository
 from utils.response import response
 
 
@@ -42,11 +43,11 @@ class UserRegisterView(APIView):
         if serializer.is_valid():
             clean_data = serializer.validated_data
             otp_service = OtpService()
-            if otp_service.get_otp(clean_data['email']):
+            if otp_service.get_otp(f"{clean_data['email']}-register"):
                 return response(error="code is already sent", status=status.HTTP_400_BAD_REQUEST)
             
             otp_service.generate_otp(clean_data['email'])
-            cache.set(key='register', value={'email': clean_data['email'], 'password': clean_data['password'], 'username': clean_data['username']}, timeout=300)
+            cache.set(key=f'{clean_data["email"]}-register', value={'email': clean_data['email'], 'password': clean_data['password'], 'username': clean_data['username']}, timeout=300)
             return response(data={'email': clean_data['email']}, status=status.HTTP_200_OK)
         return Response({'errors': serializer.errors, 'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -60,8 +61,7 @@ class UserVerifyRegisterCodeView(APIView):
 
         if serializer.is_valid():
             clean_data = serializer.validated_data
-            user_data = cache.get(key='register')
-            print(user_data)
+            user_data = cache.get(key=f'{clean_data["email"]}-register')
             if user_data is None:
                 raise ParseError({'error': 'this code not exist or invalid'}, code=status.HTTP_404_NOT_FOUND)
 
@@ -183,8 +183,10 @@ class ResetPasswordView(generic.View): # template base
             encoded_pk = kwargs.get('encoded_pk')
 
             pk = urlsafe_base64_decode(encoded_pk).decode()
-            user = User.objects.get(pk=pk)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+            user = UserRepository().get_user_by_id(pk)
+            if not user:
+                return None
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             return None
 
         form = self.form_class(request.POST)

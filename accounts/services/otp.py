@@ -36,10 +36,13 @@ class OtpService:
 
     def send_otp(self, otp: int, email: str) -> None:
         mail_subject = 'فعال سازی اکانت'
-        message = render_to_string('accounts/active_email.html', {
-            'user': email,
-            'code': otp,
-        })
+        message = render_to_string(
+            'accounts/active_email.html',
+            {
+                'user': email,
+                'code': otp,
+            }
+        )
         to_email = email
         email = EmailMessage(
             mail_subject, message, to=[to_email]

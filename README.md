@@ -1,3 +1,4 @@
+# ⚠️ This project has not been updated.
 # Music-Platform
 A web application powered by Django framework and DRF
 

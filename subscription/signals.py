@@ -15,5 +15,3 @@ def set_subscription_expire_time(sender, instance, created, *args, **kwargs):
         expire_time = instance.created_at + timedelta(minutes=1)
         instance.expire_at = expire_time
         instance.save()
-
-

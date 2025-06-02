@@ -4,20 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('music', '0005_homeslider_status'),
+        ("music", "0005_homeslider_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='category',
-            name='image',
-            field=models.ImageField(upload_to='image/category_image', verbose_name='image'),
+            model_name="category",
+            name="image",
+            field=models.ImageField(
+                upload_to="image/category_image", verbose_name="image"
+            ),
         ),
         migrations.AlterField(
-            model_name='category',
-            name='title',
-            field=models.CharField(max_length=100, verbose_name='title'),
+            model_name="category",
+            name="title",
+            field=models.CharField(max_length=100, verbose_name="title"),
         ),
     ]

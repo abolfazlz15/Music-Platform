@@ -4,18 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('music', '0006_alter_category_image_alter_category_title'),
+        ("music", "0006_alter_category_image_alter_category_title"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='category',
-            options={'verbose_name': 'دستبندی', 'verbose_name_plural': 'دستبندی ها'},
+            name="category",
+            options={"verbose_name": "دستبندی", "verbose_name_plural": "دستبندی ها"},
         ),
         migrations.AlterModelOptions(
-            name='music',
-            options={'verbose_name': 'موزیک', 'verbose_name_plural': 'موزیک ها'},
+            name="music",
+            options={"verbose_name": "موزیک", "verbose_name_plural": "موزیک ها"},
         ),
     ]

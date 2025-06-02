@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('music', '0011_alter_music_category'),
+        ("music", "0011_alter_music_category"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='music',
-            name='music_file',
-            field=models.FileField(blank=True, null=True, upload_to='music/', verbose_name='music file'),
+            model_name="music",
+            name="music_file",
+            field=models.FileField(
+                blank=True, null=True, upload_to="music/", verbose_name="music file"
+            ),
         ),
     ]

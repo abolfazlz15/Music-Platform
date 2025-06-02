@@ -6,8 +6,11 @@ from . import settings
 # from rest_framework import permissions
 # from drf_yasg.views import get_schema_view
 # from drf_yasg import openapi
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
-
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+)
 
 
 # schema_view = get_schema_view(
@@ -25,16 +28,20 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 
 
 urlpatterns = [
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    path('admin/', admin.site.urls),
-    path('playlist/', include('play_list.api.urls')),
-    path('accounts/', include('accounts.api.urls')),
-    path('music/', include('music.api.urls')),
-    path('page/', include('pages.api.urls')),
-    path('subscription/', include('subscription.api.urls')),
-    path('settings/', include('settings.api.urls')),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path("admin/", admin.site.urls),
+    path("playlist/", include("play_list.api.urls")),
+    path("accounts/", include("accounts.api.urls")),
+    path("music/", include("music.api.urls")),
+    path("page/", include("pages.api.urls")),
+    path("subscription/", include("subscription.api.urls")),
+    path("settings/", include("settings.api.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # urlpatterns += [

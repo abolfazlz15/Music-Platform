@@ -9,6 +9,7 @@ from pages.models import AboutUs, Ticket, TicketTitle
 from rest_framework import status
 from rest_framework.response import Response
 
+
 class CreateTicketView(generics.CreateAPIView):
     queryset = Ticket
     serializer_class = serializers.TicketSerializer
@@ -18,15 +19,20 @@ class CreateTicketView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response({'success': True, 'message': 'Ticket created successfully'}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            {"success": True, "message": "Ticket created successfully"},
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
 
 
 class TicketTitleListView(generics.GenericAPIView):
     serializer_class = serializers.TicketTitleListSerializer
+
     def get(self, request):
         try:
-            queryset = TicketTitle.objects.all().exclude(title='دیگر')
-            third_object = TicketTitle.objects.get(title='دیگر')
+            queryset = TicketTitle.objects.all().exclude(title="دیگر")
+            third_object = TicketTitle.objects.get(title="دیگر")
             all_objects = list(queryset) + [third_object]
             serializer = self.serializer_class(instance=all_objects, many=True)
         except:
@@ -39,6 +45,7 @@ class TicketTitleListView(generics.GenericAPIView):
 # AboutUs API
 class AboutUsView(generics.GenericAPIView):
     serializer_class = serializers.AboutUsSerializer
+
     def get(self, request):
         queryset = AboutUs.objects.first()
         serializer = self.serializer_class(instance=queryset)

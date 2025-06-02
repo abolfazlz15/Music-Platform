@@ -9,13 +9,14 @@ from accounts.models import User
 
 
 class UserCreationForm(forms.ModelForm):
-
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
+    password2 = forms.CharField(
+        label="Password confirmation", widget=forms.PasswordInput
+    )
 
     class Meta:
         model = User
-        fields = ('email', 'username')
+        fields = ("email", "username")
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -39,9 +40,21 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'username', 'is_active', 'is_admin', 'is_superuser')
+        fields = (
+            "email",
+            "password",
+            "username",
+            "is_active",
+            "is_admin",
+            "is_superuser",
+        )
 
 
 class ForotPasswordForm(forms.Form):
-    new_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'رمز عبور'}), validators=[validate_password])
-    new_password_confirm = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'تکرار رمز عبور'}))
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": "رمز عبور"}),
+        validators=[validate_password],
+    )
+    new_password_confirm = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": "تکرار رمز عبور"})
+    )

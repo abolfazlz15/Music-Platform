@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('pages', '0004_aboutus_alter_ticket_body_alter_ticket_created_at_and_more'),
+        ("pages", "0004_aboutus_alter_ticket_body_alter_ticket_created_at_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='aboutus',
-            name='required_update',
-            field=models.BooleanField(default=False, verbose_name='required update'),
+            model_name="aboutus",
+            name="required_update",
+            field=models.BooleanField(default=False, verbose_name="required update"),
         ),
     ]

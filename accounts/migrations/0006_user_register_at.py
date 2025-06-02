@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0005_user_groups_user_is_superuser_user_user_permissions'),
+        ("accounts", "0005_user_groups_user_is_superuser_user_user_permissions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='register_at',
+            model_name="user",
+            name="register_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
     ]

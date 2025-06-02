@@ -4,21 +4,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('music', '0012_music_music_file'),
+        ("music", "0012_music_music_file"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='IPAddress',
+            name="IPAddress",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('ip_address', models.GenericIPAddressField(verbose_name='ادرس آی پی')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("ip_address", models.GenericIPAddressField(verbose_name="ادرس آی پی")),
             ],
             options={
-                'verbose_name': 'آدرس آی پی',
-                'verbose_name_plural': 'آدرس های آی پی',
+                "verbose_name": "آدرس آی پی",
+                "verbose_name_plural": "آدرس های آی پی",
             },
         ),
     ]

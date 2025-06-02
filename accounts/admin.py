@@ -8,9 +8,10 @@ from accounts.models import Artist, ImageProfile, User
 from django.utils.translation import gettext_lazy as _
 
 
-admin.site.site_header = _('Music Platform')
-admin.site.site_title = _('Music Platform')
-admin.site.index_title = _('Music Platform Management')
+admin.site.site_header = _("Music Platform")
+admin.site.site_title = _("Music Platform")
+admin.site.index_title = _("Music Platform Management")
+
 
 class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
@@ -20,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         field = super().formfield_for_dbfield(db_field, request, **kwargs)
-        if db_field.name == 'is_superuser' and not request.user.is_superuser:
+        if db_field.name == "is_superuser" and not request.user.is_superuser:
             field.widget = forms.HiddenInput()
         return field
 
@@ -49,35 +50,40 @@ class UserAdmin(BaseUserAdmin):
             return self.add_fieldsets
         if not request.user.is_superuser:
             return (
-                (None, {'fields': ('email', 'password')}),
-                ('Personal info', {'fields': ('username',
-                 'profile_image', 'get_jalali_date')}),
-                ('Permissions', {'fields': ('is_active',)}),
+                (None, {"fields": ("email", "password")}),
+                (
+                    "Personal info",
+                    {"fields": ("username", "profile_image", "get_jalali_date")},
+                ),
+                ("Permissions", {"fields": ("is_active",)}),
             )
         return super().get_fieldsets(request, obj)
 
-    list_display = ('email', 'username', 'is_admin',
-                    'is_active', 'get_jalali_date')
-    list_filter = ('is_admin', 'is_active', 'is_superuser')
+    list_display = ("email", "username", "is_admin", "is_active", "get_jalali_date")
+    list_filter = ("is_admin", "is_active", "is_superuser")
 
     fieldsets = [
-        (None, {'fields': ['email', 'password']}),
-        ('Personal info', {'fields': ['username', 'profile_image', 'get_jalali_date']}),
-        ('Permissions', {'fields': ['is_admin', 'is_superuser', 'is_active']}),
+        (None, {"fields": ["email", "password"]}),
+        ("Personal info", {"fields": ["username", "profile_image", "get_jalali_date"]}),
+        ("Permissions", {"fields": ["is_admin", "is_superuser", "is_active"]}),
     ]
 
-    readonly_fields = ('get_jalali_date',)
+    readonly_fields = ("get_jalali_date",)
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'username', 'password1', 'password2'),
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "username", "password1", "password2"),
+            },
+        ),
     )
-    search_fields = ('email', 'username')
-    ordering = ('email',)
+    search_fields = ("email", "username")
+    ordering = ("email",)
     filter_horizontal = ()
-    list_select_related = ['profile_image']
+    list_select_related = ["profile_image"]
     list_per_page = 50
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(ImageProfile)

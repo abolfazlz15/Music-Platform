@@ -22,7 +22,9 @@ class OtpService:
             return False
         stored_otp, timestamp = stored_otp_info
         if stored_otp == int(otp):
-            if datetime.datetime.now() - timestamp > datetime.timedelta(minutes=self.otp_expiry_minutes):
+            if datetime.datetime.now() - timestamp > datetime.timedelta(
+                minutes=self.otp_expiry_minutes
+            ):
                 self.clear_otp(email)
                 return False
             else:
@@ -35,21 +37,19 @@ class OtpService:
         cache.delete(email)
 
     def send_otp(self, otp: int, email: str) -> None:
-        mail_subject = 'فعال سازی اکانت'
+        mail_subject = "فعال سازی اکانت"
         message = render_to_string(
-            'accounts/active_email.html',
+            "accounts/active_email.html",
             {
-                'user': email,
-                'code': otp,
-            }
+                "user": email,
+                "code": otp,
+            },
         )
         to_email = email
-        email = EmailMessage(
-            mail_subject, message, to=[to_email]
-        )
+        email = EmailMessage(mail_subject, message, to=[to_email])
 
         email.send()
-    
+
     @staticmethod
     def get_otp(key: str) -> int:
         if key:

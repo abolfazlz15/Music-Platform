@@ -4,22 +4,24 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('pages', '0002_ticket_delete_contactus'),
+        ("pages", "0002_ticket_delete_contactus"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='ContactUsTitle',
-            new_name='TicketTitle',
+            old_name="ContactUsTitle",
+            new_name="TicketTitle",
         ),
         migrations.AlterModelOptions(
-            name='ticket',
-            options={'verbose_name': 'تیکت', 'verbose_name_plural': 'تیکت'},
+            name="ticket",
+            options={"verbose_name": "تیکت", "verbose_name_plural": "تیکت"},
         ),
         migrations.AlterModelOptions(
-            name='tickettitle',
-            options={'verbose_name': 'عنوان تیکت', 'verbose_name_plural': 'عنواین تیکت'},
+            name="tickettitle",
+            options={
+                "verbose_name": "عنوان تیکت",
+                "verbose_name_plural": "عنواین تیکت",
+            },
         ),
     ]

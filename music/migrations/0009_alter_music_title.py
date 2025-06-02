@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('music', '0008_alter_choosemusicbycategory_options_and_more'),
+        ("music", "0008_alter_choosemusicbycategory_options_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='music',
-            name='title',
-            field=models.CharField(max_length=150, verbose_name='title'),
+            model_name="music",
+            name="title",
+            field=models.CharField(max_length=150, verbose_name="title"),
         ),
     ]

@@ -26,7 +26,7 @@ from utils.response import response
 class UserLoginView(APIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = serializers.UserLoginSerializer
-   
+
     @swagger_auto_schema(request_body=serializers.UserLoginSerializer)
     def post(self, request):
         serializer = serializers.UserLoginSerializer(data=request.data)
@@ -45,12 +45,27 @@ class UserRegisterView(APIView):
             clean_data = serializer.validated_data
             otp_service = OtpService()
             if otp_service.get_otp(f"{clean_data['email']}-register"):
-                return response(error="code is already sent", status=status.HTTP_400_BAD_REQUEST)
-            
-            otp_service.generate_otp(clean_data['email'])
-            cache.set(key=f'{clean_data["email"]}-register', value={'email': clean_data['email'], 'password': clean_data['password'], 'username': clean_data['username']}, timeout=300)
-            return response(data={'email': clean_data['email']}, status=status.HTTP_200_OK)
-        return Response({'errors': serializer.errors, 'success': False}, status=status.HTTP_400_BAD_REQUEST)
+                return response(
+                    error="code is already sent", status=status.HTTP_400_BAD_REQUEST
+                )
+
+            otp_service.generate_otp(clean_data["email"])
+            cache.set(
+                key=f"{clean_data['email']}-register",
+                value={
+                    "email": clean_data["email"],
+                    "password": clean_data["password"],
+                    "username": clean_data["username"],
+                },
+                timeout=300,
+            )
+            return response(
+                data={"email": clean_data["email"]}, status=status.HTTP_200_OK
+            )
+        return Response(
+            {"errors": serializer.errors, "success": False},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class UserVerifyRegisterCodeView(APIView):
@@ -63,16 +78,28 @@ class UserVerifyRegisterCodeView(APIView):
 
         if serializer.is_valid():
             clean_data = serializer.validated_data
-            user_data = cache.get(key=f'{clean_data["email"]}-register')
+            user_data = cache.get(key=f"{clean_data['email']}-register")
             if user_data is None:
-                raise ParseError({'error': 'this code not exist or invalid'}, code=status.HTTP_404_NOT_FOUND)
+                raise ParseError(
+                    {"error": "this code not exist or invalid"},
+                    code=status.HTTP_404_NOT_FOUND,
+                )
 
-            if otp_service.verify_otp(otp=clean_data['code'], email=clean_data['email']):
-                user = User.objects.create_user(email=user_data['email'], username=user_data['username'], password=user_data['password'])
+            if otp_service.verify_otp(
+                otp=clean_data["code"], email=clean_data["email"]
+            ):
+                user = User.objects.create_user(
+                    email=user_data["email"],
+                    username=user_data["username"],
+                    password=user_data["password"],
+                )
                 result = serializer.save(validated_data=user)
                 return Response(result, status=status.HTTP_201_CREATED)
 
-            return Response({'error': 'this code not exist or invalid', 'success': False}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "this code not exist or invalid", "success": False},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
@@ -81,7 +108,7 @@ class UserProfileView(APIView):
 
     def get(self, request, pk):
         user = get_object_or_404(User, id=pk)
-        serializer = self.serializer_class(instance=user, context={'request': request})
+        serializer = self.serializer_class(instance=user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -99,41 +126,50 @@ class UserUpdateProfileView(APIView):
         serializer = self.serializer_class(instance=user, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'data': serializer.data, 'success': True}, status=status.HTTP_200_OK)
-        return Response({'errors': serializer.errors, 'success': False}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"data": serializer.data, "success": True}, status=status.HTTP_200_OK
+            )
+        return Response(
+            {"errors": serializer.errors, "success": False},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class ChangePasswordView(UpdateAPIView):
-        """
-        An endpoint for changing password.
-        """
-        serializer_class = serializers.ChangePasswordSerializer
-        model = User
+    """
+    An endpoint for changing password.
+    """
 
-        def get_object(self, queryset=None):
-            obj = self.request.user
-            return obj
+    serializer_class = serializers.ChangePasswordSerializer
+    model = User
 
-        def update(self, request, *args, **kwargs):
-            self.object = self.get_object()
-            serializer = self.get_serializer(data=request.data)
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
 
-            if serializer.is_valid():
-                # Check old password
-                if not self.object.check_password(serializer.data.get("old_password")):
-                    return Response({"old_password": ["Wrong password."], 'status': False}, status=status.HTTP_400_BAD_REQUEST)
-                # set_password also hashes the password that the user will get
-                self.object.set_password(serializer.data.get("new_password"))
-                self.object.save()
-                response = {
-                    'status': True,
-                    'code': status.HTTP_200_OK,
-                    'message': 'Password updated successfully',
-                }
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
 
-                return Response(response)
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response(
+                    {"old_password": ["Wrong password."], "status": False},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                "status": True,
+                "code": status.HTTP_200_OK,
+                "message": "Password updated successfully",
+            }
 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ArtistProfileView(generics.GenericAPIView):
@@ -141,10 +177,12 @@ class ArtistProfileView(generics.GenericAPIView):
 
     def get(self, request, pk):
         instance = Artist.objects.get(id=pk)
-        serializer = self.serializer_class(instance=instance, context={'request': request})
+        serializer = self.serializer_class(
+            instance=instance, context={"request": request}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-   
+
 class ForgotPasswordView(APIView):
     serializer_class = serializers.ForgotPasswordSerializer
     permission_classes = [permissions.AllowAny]
@@ -152,44 +190,47 @@ class ForgotPasswordView(APIView):
     def post(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data['email']
+            email = serializer.validated_data["email"]
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                return Response({'email': 'User does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-            
+                return Response(
+                    {"email": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST
+                )
+
             encoded_pk = urlsafe_base64_encode(force_bytes(user.pk))
             token = PasswordResetTokenGenerator().make_token(user)
             reset_url = reverse(
                 "accounts:change_password",
                 kwargs={"encoded_pk": encoded_pk, "token": token},
             )
-            reset_link = f'{request.get_host()}/{reset_url}'
-            message = render_to_string('accounts/forgot_password_link.html', {
-                'link': reset_link,
-            })
-            to_email = email
-            email = EmailMessage(
-                'بازیابی ایمیل',
-                message,
-                to=[to_email]
+            reset_link = f"{request.get_host()}/{reset_url}"
+            message = render_to_string(
+                "accounts/forgot_password_link.html",
+                {
+                    "link": reset_link,
+                },
             )
+            to_email = email
+            email = EmailMessage("بازیابی ایمیل", message, to=[to_email])
             email.send()
-            return Response({'detail': 'Password reset link sent'}, status=status.HTTP_200_OK)
+            return Response(
+                {"detail": "Password reset link sent"}, status=status.HTTP_200_OK
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ResetPasswordView(generic.View): # template base
+class ResetPasswordView(generic.View):  # template base
     form_class = ForotPasswordForm
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
-        return render(request, 'accounts/forgot_password.html', context={'form': form})
-    
+        return render(request, "accounts/forgot_password.html", context={"form": form})
+
     def post(self, request, *args, **kwargs):
         try:
-            token = kwargs.get('token')
-            encoded_pk = kwargs.get('encoded_pk')
+            token = kwargs.get("token")
+            encoded_pk = kwargs.get("encoded_pk")
 
             pk = urlsafe_base64_decode(encoded_pk).decode()
             user = UserRepository().get_user_by_id(pk)
@@ -202,17 +243,23 @@ class ResetPasswordView(generic.View): # template base
         if form.is_valid():
             data = form.cleaned_data
             if PasswordResetTokenGenerator().check_token(user, token):
-                password = data['new_password']
-                confirm_password = data['new_password_confirm']
+                password = data["new_password"]
+                confirm_password = data["new_password_confirm"]
                 if password != confirm_password:
-                    messages.add_message(request, messages.WARNING, 'رمز عبور شما مطابقت ندارد')
+                    messages.add_message(
+                        request, messages.WARNING, "رمز عبور شما مطابقت ندارد"
+                    )
                 user.set_password(password)
                 user.save()
-                return redirect('accounts:reset_password_done')  
+                return redirect("accounts:reset_password_done")
             else:
-                messages.add_message(request, messages.WARNING, 'مشکلی وجود دارد، لطفا دوباره امتحان کنید')
-        return render(request, 'accounts/forgot_password.html', context={'form': form})
+                messages.add_message(
+                    request,
+                    messages.WARNING,
+                    "مشکلی وجود دارد، لطفا دوباره امتحان کنید",
+                )
+        return render(request, "accounts/forgot_password.html", context={"form": form})
 
 
 class RestPasswordDoneView(generic.TemplateView):
-    template_name = 'accounts/reset_password_done.html'
+    template_name = "accounts/reset_password_done.html"

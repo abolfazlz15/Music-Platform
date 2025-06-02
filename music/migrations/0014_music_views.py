@@ -4,15 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('music', '0013_ipaddress'),
+        ("music", "0013_ipaddress"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='music',
-            name='views',
-            field=models.ManyToManyField(blank=True, related_name='musics', to='music.ipaddress', verbose_name='views'),
+            model_name="music",
+            name="views",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="musics",
+                to="music.ipaddress",
+                verbose_name="views",
+            ),
         ),
     ]

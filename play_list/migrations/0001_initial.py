@@ -6,40 +6,79 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('music', '0012_music_music_file'),
+        ("music", "0012_music_music_file"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Playlist',
+            name="Playlist",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('songs', models.ManyToManyField(blank=True, related_name='playlists', to='music.music', verbose_name='songs')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='playlists', to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, verbose_name="name")),
+                (
+                    "songs",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="playlists",
+                        to="music.music",
+                        verbose_name="songs",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="playlists",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="user",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'پلی لیست',
-                'verbose_name_plural': 'پلی لیست ها',
+                "verbose_name": "پلی لیست",
+                "verbose_name_plural": "پلی لیست ها",
             },
         ),
         migrations.CreateModel(
-            name='ApprovedPlaylist',
+            name="ApprovedPlaylist",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('cover', models.ImageField(upload_to='image/palylist/cover')),
-                ('is_international', models.BooleanField(default=False)),
-                ('songs', models.ManyToManyField(blank=True, related_name='approved_playlists', to='music.music', verbose_name='songs')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, verbose_name="name")),
+                ("cover", models.ImageField(upload_to="image/palylist/cover")),
+                ("is_international", models.BooleanField(default=False)),
+                (
+                    "songs",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="approved_playlists",
+                        to="music.music",
+                        verbose_name="songs",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'پلی لیست عمومی',
-                'verbose_name_plural': 'پلی لیست های عمومی',
+                "verbose_name": "پلی لیست عمومی",
+                "verbose_name_plural": "پلی لیست های عمومی",
             },
         ),
     ]

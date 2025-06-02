@@ -5,15 +5,21 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0003_artist'),
+        ("accounts", "0003_artist"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='profile_image',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='users', to='accounts.imageprofile', verbose_name='image/profile_image'),
+            model_name="user",
+            name="profile_image",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="users",
+                to="accounts.imageprofile",
+                verbose_name="image/profile_image",
+            ),
         ),
     ]

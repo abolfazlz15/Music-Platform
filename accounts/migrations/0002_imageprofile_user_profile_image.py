@@ -5,23 +5,42 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0001_initial'),
+        ("accounts", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ImageProfile',
+            name="ImageProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=100, verbose_name='title')),
-                ('image', models.ImageField(upload_to='profile_image', verbose_name='image profile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=100, verbose_name="title")),
+                (
+                    "image",
+                    models.ImageField(
+                        upload_to="profile_image", verbose_name="image profile"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='user',
-            name='profile_image',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='users', to='accounts.imageprofile', verbose_name='profile image'),
+            model_name="user",
+            name="profile_image",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="users",
+                to="accounts.imageprofile",
+                verbose_name="profile image",
+            ),
         ),
     ]

@@ -5,19 +5,24 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('music', '0009_alter_music_title'),
+        ("music", "0009_alter_music_title"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='music',
-            name='category',
+            model_name="music",
+            name="category",
         ),
         migrations.AddField(
-            model_name='music',
-            name='category',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='musics', to='music.category', verbose_name='category'),
+            model_name="music",
+            name="category",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="musics",
+                to="music.category",
+                verbose_name="category",
+            ),
         ),
     ]

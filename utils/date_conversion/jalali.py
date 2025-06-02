@@ -3,15 +3,18 @@ import datetime
 
 
 class Gregorian:
-
     def __init__(self, *date):
         # Parse date
         if len(date) == 1:
             date = date[0]
             if type(date) is str:
-                m = re.match(r'^(\d{4})\D(\d{1,2})\D(\d{1,2})$', date)
+                m = re.match(r"^(\d{4})\D(\d{1,2})\D(\d{1,2})$", date)
                 if m:
-                    [year, month, day] = [int(m.group(1)), int(m.group(2)), int(m.group(3))]
+                    [year, month, day] = [
+                        int(m.group(1)),
+                        int(m.group(2)),
+                        int(m.group(3)),
+                    ]
                 else:
                     raise Exception("Invalid Input String")
             elif type(date) is datetime.date:
@@ -46,7 +49,7 @@ class Gregorian:
         doy_g = g_a[month] + day
         if d_4 == 0 and month > 2:
             doy_g += 1
-        d_33 = int(((year - 16) % 132) * .0305)
+        d_33 = int(((year - 16) % 132) * 0.0305)
         a = 286 if (d_33 == 3 or d_33 < (d_4 - 1) or d_4 == 0) else 287
         if (d_33 == 1 or d_33 == 2) and (d_33 == d_4 or d_4 == 1):
             b = 78
@@ -77,19 +80,24 @@ class Gregorian:
         return self.persian_year, self.persian_month, self.persian_day
 
     def persian_string(self, date_format="{}-{}-{}"):
-        return date_format.format(self.persian_year, self.persian_month, self.persian_day)
+        return date_format.format(
+            self.persian_year, self.persian_month, self.persian_day
+        )
 
 
 class Persian:
-
     def __init__(self, *date):
         # Parse date
         if len(date) == 1:
             date = date[0]
             if type(date) is str:
-                m = re.match(r'^(\d{4})\D(\d{1,2})\D(\d{1,2})$', date)
+                m = re.match(r"^(\d{4})\D(\d{1,2})\D(\d{1,2})$", date)
                 if m:
-                    [year, month, day] = [int(m.group(1)), int(m.group(2)), int(m.group(3))]
+                    [year, month, day] = [
+                        int(m.group(1)),
+                        int(m.group(2)),
+                        int(m.group(3)),
+                    ]
                 else:
                     raise Exception("Invalid Input String")
             elif type(date) is tuple:
@@ -107,7 +115,14 @@ class Persian:
             raise Exception("Invalid Input")
 
         # Check validity of date. TODO better check (leap years)
-        if year < 1 or month < 1 or month > 12 or day < 1 or day > 31 or (month > 6 and day == 31):
+        if (
+            year < 1
+            or month < 1
+            or month > 12
+            or day < 1
+            or day > 31
+            or (month > 6 and day == 31)
+        ):
             raise Exception("Incorrect Date")
 
         self.persian_year = year
@@ -120,7 +135,7 @@ class Persian:
             doy_j = ((month - 1) * 31) + day
         else:
             doy_j = ((month - 7) * 30) + day + 186
-        d_33 = int(((year - 55) % 132) * .0305)
+        d_33 = int(((year - 55) % 132) * 0.0305)
         a = 287 if (d_33 != 3 and d_4 <= d_33) else 286
         if (d_33 == 1 or d_33 == 2) and (d_33 == d_4 or d_4 == 1):
             b = 78
@@ -135,7 +150,9 @@ class Persian:
         else:
             gy = year + 622
             gd = doy_j - a
-        for gm, v in enumerate([0, 31, 29 if (gy % 4 == 0) else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]):
+        for gm, v in enumerate(
+            [0, 31, 29 if (gy % 4 == 0) else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        ):
             if gd <= v:
                 break
             gd -= v
@@ -148,7 +165,11 @@ class Persian:
         return self.gregorian_year, self.gregorian_month, self.gregorian_day
 
     def gregorian_string(self, date_format="{}-{}-{}"):
-        return date_format.format(self.gregorian_year, self.gregorian_month, self.gregorian_day)
+        return date_format.format(
+            self.gregorian_year, self.gregorian_month, self.gregorian_day
+        )
 
     def gregorian_datetime(self):
-        return datetime.date(self.gregorian_year, self.gregorian_month, self.gregorian_day)
+        return datetime.date(
+            self.gregorian_year, self.gregorian_month, self.gregorian_day
+        )

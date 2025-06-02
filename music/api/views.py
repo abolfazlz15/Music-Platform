@@ -1,11 +1,12 @@
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Min, Q
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.api.serializers import ArtistListSerializer, UserSerializer
+from accounts.api.serializers import ArtistListSerializer, UserDetailSerializer
 from accounts.models import Artist, User
 from music.api import serializers
 from music.models import (Category, ChooseMusicByCategory, FavoriteMusic,
@@ -144,7 +145,10 @@ class UserFavoriteMusicView(generics.ListAPIView):
         favorite_music_ids = FavoriteMusic.objects.filter(user__id=self.kwargs['pk']).values_list('music_id', flat=True)
         return Music.objects.filter(id__in=favorite_music_ids)
 
-
+@extend_schema(
+    request=int,
+    responses=dict,
+)
 class UserAddFavoriteMusicView(generics.GenericAPIView):
 
     def post(self, request):
@@ -153,10 +157,10 @@ class UserAddFavoriteMusicView(generics.GenericAPIView):
         try:
             like = FavoriteMusic.objects.get(music_id=request.data['pk'], user_id=request.user.id)
             like.delete()
-            return Response({'status': False, 'result': 'unlike'}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'status': False}, status=status.HTTP_204_NO_CONTENT)
         except:
             FavoriteMusic.objects.create(user=request.user, music=music)
-            return Response({'status': True, 'result': 'like'}, status=status.HTTP_200_OK)
+            return Response({'status': True}, status=status.HTTP_200_OK)
 
 
 class MusicSearchView(APIView):
@@ -172,7 +176,78 @@ class MusicSearchView(APIView):
             'previous': page.previous_page_number() if page.has_previous() else None,
             'results': page
         }
-    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='search',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description='Search term for music, artist, or user',
+                required=True
+            ),
+            OpenApiParameter(
+                name='music_page',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description='Page number for music results',
+                default=1
+            ),
+            OpenApiParameter(
+                name='user_page',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description='Page number for user results',
+                default=1
+            ),
+            OpenApiParameter(
+                name='artist_page',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description='Page number for artist results',
+                default=1
+            ),
+        ],
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'music': {
+                        'type': 'object',
+                        'properties': {
+                            'count': {'type': 'integer'},
+                            'next': {'type': 'integer', 'nullable': True},
+                            'previous': {'type': 'integer', 'nullable': True},
+                            'results': {'type': 'array', 'items': {'$ref': '#/components/schemas/MusicList'}},
+                        }
+                    },
+                    'user': {
+                        'type': 'object',
+                        'properties': {
+                            'count': {'type': 'integer'},
+                            'next': {'type': 'integer', 'nullable': True},
+                            'previous': {'type': 'integer', 'nullable': True},
+                            'results': {'type': 'array', 'items': {'$ref': '#/components/schemas/User'}},
+                        }
+                    },
+                    'artist': {
+                        'type': 'object',
+                        'properties': {
+                            'count': {'type': 'integer'},
+                            'next': {'type': 'integer', 'nullable': True},
+                            'previous': {'type': 'integer', 'nullable': True},
+                            'results': {'type': 'array', 'items': {'$ref': '#/components/schemas/ArtistList'}},
+                        }
+                    },
+                }
+            },
+            (200, 'no_search'): {
+                'type': 'object',
+                'properties': {
+                    'result': {'type': 'string', 'example': 'there is no content'}
+                }
+            }
+        }
+    )
     def get(self, request):
         search = request.query_params.get('search', None)
         if not search:
@@ -188,7 +263,7 @@ class MusicSearchView(APIView):
 
         users = User.objects.filter(username__icontains=search).exclude(id=request.user.id)
         user_data = self.paginate_queryset(users, per_page=15, page_number=request.query_params.get('user_page', 1))
-        user_serializer = UserSerializer(instance=user_data['results'], many=True, context={'request': request})
+        user_serializer = UserDetailSerializer(instance=user_data['results'], many=True, context={'request': request})
 
         artists = Artist.objects.filter(name__icontains=search)
         artist_data = self.paginate_queryset(artists, per_page=15, page_number=request.query_params.get('artist_page', 1))

@@ -1,8 +1,9 @@
+from django.utils.html import strip_tags
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from accounts.models import Artist
 from music.models import Category, HomeSlider, Music
-from django.utils.html import strip_tags
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -40,7 +41,7 @@ class MusicListSerializer(serializers.ModelSerializer):
         model = Music
         fields = ('id', 'title', 'artist', 'cover')
 
-    def get_cover(self, obj):
+    def get_cover(self, obj) -> None | str:
         request = self.context.get('request')
         # add base URL for cover music
         if obj.cover:
@@ -60,11 +61,11 @@ class MusicDetailSerializer(serializers.ModelSerializer):
         model = Music
         fields = ('id', 'title', 'artist', 'cover', 'text', 'url', 'music_file', 'category', 'like', 'related_music')
 
+    @extend_schema_field(CategorySerializer)
     def get_category(self, obj):
-        serializer = CategorySerializer(instance=obj.category)
-        return serializer.data
+        return CategorySerializer(instance=obj.category)
 
-    def get_cover(self, obj):
+    def get_cover(self, obj) -> None | str:
         request = self.context.get('request')
         # add base URL for cover music
         if obj.cover:
@@ -72,15 +73,13 @@ class MusicDetailSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(image_url)
         return None
 
-    def get_like(self, obj):
-        is_liked = self.context.get('is_liked')
-        return is_liked
+    def get_like(self, obj) -> bool:
+        return self.context.get('is_liked')
 
+    @extend_schema_field(MusicListSerializer(many=True))
     def get_related_music(self, obj):
         context = self.context.get('related_music')
-
-        serializer = MusicListSerializer(instance=context, many=True, context={'request': self.context.get('request')})
-        return serializer.data
+        return  MusicListSerializer(instance=context, many=True, context={'request': self.context.get('request')}).data
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

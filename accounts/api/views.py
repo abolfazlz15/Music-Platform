@@ -37,9 +37,10 @@ class UserLoginView(APIView):
 
 class UserRegisterView(APIView):
     permission_classes = [permissions.AllowAny]
+    serializer_class = serializers.UserRegisterSerializer
 
     def post(self, request):
-        serializer = serializers.UserRegisterSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             clean_data = serializer.validated_data
             otp_service = OtpService()
@@ -54,9 +55,10 @@ class UserRegisterView(APIView):
 
 class UserVerifyRegisterCodeView(APIView):
     permission_classes = [permissions.AllowAny]
+    serializer_class = serializers.GetOTPRegisterCodeSerializer
 
     def post(self, request):
-        serializer = serializers.GetOTPRegisterCodeSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         otp_service = OtpService()
 
         if serializer.is_valid():
@@ -75,21 +77,26 @@ class UserVerifyRegisterCodeView(APIView):
 
 
 class UserProfileView(APIView):
+    serializer_class = serializers.UserDetailSerializer
+
     def get(self, request, pk):
         user = get_object_or_404(User, id=pk)
-        serializer = serializers.UserSerializer(instance=user, context={'request': request})
+        serializer = self.serializer_class(instance=user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ImageProfileListView(generics.ListAPIView):
     serializer_class = serializers.ImageListSerializer
+
     queryset = ImageProfile.objects.all()
 
 
 class UserUpdateProfileView(APIView):
+    serializer_class = serializers.UserProfileUpdateSerializer
+
     def put(self, request):
         user = request.user
-        serializer = serializers.UserProfileUpdateSerializer(instance=user, data=request.data)
+        serializer = self.serializer_class(instance=user, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({'data': serializer.data, 'success': True}, status=status.HTTP_200_OK)
@@ -130,9 +137,11 @@ class ChangePasswordView(UpdateAPIView):
 
 
 class ArtistProfileView(generics.GenericAPIView):
+    serializer_class = serializers.ArtistDetailSerializer
+
     def get(self, request, pk):
         instance = Artist.objects.get(id=pk)
-        serializer = serializers.ArtistDetailSerializer(instance=instance, context={'request': request})
+        serializer = self.serializer_class(instance=instance, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
    

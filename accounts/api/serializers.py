@@ -3,6 +3,7 @@ from django.db.models import Count
 from rest_framework import serializers, status
 from rest_framework.exceptions import ParseError
 from rest_framework_simplejwt.tokens import RefreshToken
+from drf_spectacular.utils import extend_schema_field
 
 from accounts.models import Artist, ImageProfile, User
 from music.api.serializers import MusicListSerializer
@@ -21,10 +22,10 @@ class ImageProfileSerializer(serializers.ModelSerializer):
     #         return request.build_absolute_uri(image_url)
     #     return None
     
-class UserSerializer(serializers.ModelSerializer):
+class UserDetailSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
-    def get_image(self, obj):
+    def get_image(self, obj) -> None | str:
         request = self.context.get('request')
         if obj.profile_image:
             image_url = obj.profile_image.image.url
@@ -125,17 +126,15 @@ class ArtistDetailSerializer(serializers.ModelSerializer):
         model = Artist
         fields = ('id', 'name', 'image', 'music_quantity', 'recent_music', 'popular_music')
 
-    def get_music_quantity(self, artist):
+    def get_music_quantity(self, artist) -> int:
         return artist.musics.count()
 
+    @extend_schema_field(MusicListSerializer(many=True))
     def get_recent_music(self, artist):
-        """
-        Retrieve 10 most recent artist music tracks
-        """
         request = self.context.get('request')
         musics = artist.musics.order_by('-created_at')[:10]
         return MusicListSerializer(musics, many=True, context={'request': request}).data
-
+    @extend_schema_field(MusicListSerializer(many=True))
     def get_popular_music(self, artist):
         """
         Retrieve 10 most popular music tracks
@@ -144,7 +143,7 @@ class ArtistDetailSerializer(serializers.ModelSerializer):
         musics = artist.musics.annotate(play_count=Count('favorite_musics')).filter(status=True).order_by('-play_count')[:10]
         return MusicListSerializer(musics, many=True, context={'request': request}).data
     
-    def get_image(self, obj):
+    def get_image(self, obj) -> None | str:
         request = self.context.get('request')
         # add base URL for cover music
         if obj.image:
@@ -159,7 +158,7 @@ class ArtistListSerializer(serializers.ModelSerializer):
         model = Artist
         fields = ('id', 'name', 'image')
 
-    def get_image(self, obj):
+    def get_image(self, obj) -> None | str:
         request = self.context.get('request')
         # add base URL for cover music
         if obj.image:

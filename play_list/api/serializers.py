@@ -1,8 +1,9 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from accounts.models import User
 from music.api.serializers import MusicListSerializer
-from play_list.models import Playlist, ApprovedPlaylist
+from play_list.models import ApprovedPlaylist, Playlist
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -21,11 +22,11 @@ class PlayListSerializer(serializers.ModelSerializer):
         model = Playlist
         fields = ('id', 'name', 'user', 'cover', 'number_of_songs')
 
+    @extend_schema_field(UserSerializer)
     def get_user(self, obj):
-        serializer = UserSerializer(instance=obj.user)
-        return serializer.data
+        return UserSerializer(instance=obj.user)
     
-    def get_cover(self, obj):
+    def get_cover(self, obj) -> None | str:
         request = self.context.get('request')
         music = obj.songs.last()
         if music:
@@ -33,7 +34,7 @@ class PlayListSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(cover)
         return None
 
-    def get_number_of_songs(self, obj):
+    def get_number_of_songs(self, obj) -> int:
         return obj.number_of_songs
 
 
@@ -44,10 +45,10 @@ class PlayListDetailSerializer(serializers.ModelSerializer):
         model = Playlist
         fields = ('id', 'name', 'music')
 
+    @extend_schema_field(MusicListSerializer(many=True))
     def get_music(self, obj):
         request = self.context.get('request')
-        serializer = MusicListSerializer(instance=obj.songs.all(), many=True, context={'request': request})
-        return serializer.data
+        return MusicListSerializer(instance=obj.songs.all(), many=True, context={'request': request}).data
 
 
 class PlayListUpdateAndCreateSerializer(serializers.ModelSerializer):
@@ -72,7 +73,7 @@ class ApprovedPlaylistSerializer(serializers.ModelSerializer):
         model = ApprovedPlaylist
         fields = ('id', 'name', 'cover')
 
-    def get_cover(self, obj):
+    def get_cover(self, obj) -> None | str:
         request = self.context.get('request')
         music = obj.songs.first() 
         if music:
@@ -87,7 +88,7 @@ class ApprovedPlaylistDetailSerializer(serializers.ModelSerializer):
         model = ApprovedPlaylist
         fields = ('id', 'name' , 'cover', 'music')
 
+    @extend_schema_field(MusicListSerializer(many=True))
     def get_music(self, obj):
         request = self.context.get('request')
-        serializer = MusicListSerializer(instance=obj.songs.all(), many=True, context={'request': request})
-        return serializer.data
+        return MusicListSerializer(instance=obj.songs.all(), many=True, context={'request': request}).data

@@ -1,5 +1,6 @@
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,7 +8,7 @@ from rest_framework.views import APIView
 from music.models import Music
 from play_list.api import permissions as custom_permissions
 from play_list.api import serializers
-from play_list.models import Playlist, ApprovedPlaylist
+from play_list.models import ApprovedPlaylist, Playlist
 
 
 class UserPlayListView(APIView):
@@ -58,7 +59,12 @@ class UserUpdatePlayListView(APIView):
 
 class DeletePlayListView(APIView):
     permission_classes = [custom_permissions.IsAuthorOrReadOnly]
-
+    @extend_schema(
+        responses={
+            204: OpenApiResponse(description='Playlist deleted successfully'),
+            404: OpenApiResponse(description='Playlist not found'),
+        }
+    )
     def delete(self, request, pk):
         playlist = get_object_or_404(Playlist, id=pk)
         self.check_object_permissions(request, playlist)
@@ -115,7 +121,39 @@ class PlaylistRemoveMusicView(generics.DestroyAPIView):
 
 
 class ApprovedPlaylistView(APIView):
-    
+    @extend_schema(
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'international_playlist': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'object',
+                            'properties': {
+                                'id': {'type': 'integer'},
+                                'name': {'type': 'string'},
+                                'cover': {'type': 'string', 'nullable': True},
+                            }
+                        },
+                        'description': 'List of up to 5 international playlists, ordered by ID (descending)',
+                    },
+                    'iranian_playlist': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'object',
+                            'properties': {
+                                'id': {'type': 'integer'},
+                                'name': {'type': 'string'},
+                                'cover': {'type': 'string', 'nullable': True},
+                            }
+                        },
+                        'description': 'List of up to 5 Iranian playlists, ordered by ID (descending)',
+                    },
+                }
+            }
+        }
+    )
     def get(self, request):
         international_playlist = ApprovedPlaylist.objects.filter(is_international=True).order_by('-id')[:5]
         iranian_playlist = ApprovedPlaylist.objects.filter(is_international=False).order_by('-id')[:5]
